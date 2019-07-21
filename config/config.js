@@ -17,7 +17,7 @@ const plugins = [
       },
       locale: {
         // default false
-        enable: true,
+        enable: false,
         // default zh-CN
         default: 'zh-CN',
         // default true, when it is true, will use `navigator.language` overwrite default
@@ -83,13 +83,67 @@ export default {
   routes: [
     {
       path: '/',
+      redirect: '/list'
+    },
+    {
+      path: '/login',
+      component: '../layouts/LoginLayout',
+    },
+    {
+      path: '/list',
+      component: '../layouts/UserLayout',
+      Routes: ['src/pages/Authorized'],
+      authority: ['admin', 'user'],
+      routes: [
+        {
+          path: '/list',
+          name: 'welcome',
+          icon: '',
+          component: './ProjectList/index',
+        },
+        {
+          component: './404',
+        },
+      ],
+    },
+    // 简介页面
+    {
+      path: '/project/:id',
       component: '../layouts/BasicLayout',
       Routes: ['src/pages/Authorized'],
       authority: ['admin', 'user'],
       routes: [
         {
-          path: '/',
-          name: 'welcome',
+          path: '/project/:id',
+          redirect: '/project/:id/detail'
+        },
+        {
+          path: '/project/:id/detail',
+          name: '顺场表',
+          component: './Overall/SenceManage',
+        },
+      ],
+    },
+    // 统筹页面
+    {
+      path: '/overall/:id',
+      component: '../layouts/BasicLayout',
+      Routes: ['src/pages/Authorized'],
+      authority: ['admin', 'user'],
+      routes: [
+        {
+          path: '/overall/:id',
+          redirect: '/overall/:id/sence'
+        },
+        {
+          path: '/overall/:id/sence',
+          name: '顺场表',
+          icon: 'smile',
+          component: './Overall/SenceManage',
+        },
+        {
+          path: '/project/:id/welcome',
+          name: '哈哈哈',
           icon: 'smile',
           component: './Welcome',
         },
@@ -144,13 +198,12 @@ export default {
     basePath: '/',
   },
   chainWebpack: webpackPlugin,
-  /*
   proxy: {
-    '/server/api/': {
-      target: 'https://preview.pro.ant.design/',
+    '/api': {
+      // target: 'http://www.easyaction.cn',
+      target: 'http://121.199.36.247:8088',
       changeOrigin: true,
-      pathRewrite: { '^/server': '' },
+      pathRewrite: { '^/api': '' },
     },
   },
-  */
 };
