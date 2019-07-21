@@ -119,8 +119,8 @@ export default {
         },
         {
           path: '/project/:id/detail',
-          name: '顺场表',
-          component: './Overall/SenceManage',
+          name: '控制台',
+          component: './Base',
         },
       ],
     },
