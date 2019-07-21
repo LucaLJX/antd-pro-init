@@ -1,26 +1,15 @@
-import { parse, stringify } from 'qs';
-import { routerRedux } from 'dva/router';
-export function getPageQuery() {
-  return parse(window.location.href.split('?')[1]);
-}
+import { UserLogin } from '@/services/login';
+
 const Model = {
   namespace: 'login',
   state: {
     status: undefined,
   },
   effects: {
-    *logout(_, { put }) {
-      const { redirect } = getPageQuery(); // redirect
-
-      if (window.location.pathname !== '/user/login' && !redirect) {
-        yield put(
-          routerRedux.replace({
-            pathname: '/user/login',
-            search: stringify({
-              redirect: window.location.href,
-            }),
-          })
-        );
+    *UserLogin({ payload, callback }, { call, put }) {
+      const { data } = yield call(UserLogin, payload);
+      if (data && data.code === 0) {
+        if (callback) callback(data);
       }
     },
   },
