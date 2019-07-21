@@ -1,0 +1,56 @@
+.card {
+  height: 310px;
+  background: #fff;
+  position: relative;
+  border-radius: 0.1rem;
+  margin: 10px 0;
+  &:hover {
+    transform: translateY(-5px);
+    transition: all .3s;
+  }
+  :global {
+    .ant-card-cover {
+      height: 200px;
+      img {
+        height: 100%;
+      }
+    }
+    .ant-card-body {
+      padding: 20px;
+    }
+    .ant-card-meta-description {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      width: 100%;
+    }
+    .ant-card-meta-title {
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .ant-card-meta-detail>div:not(:last-child) {
+      margin-bottom: 0;
+    }
+  }
+  .bottominfo {
+    margin-top: 10px;
+    overflow: hidden;
+    >span {
+      float: left;
+      font-size: 12px;
+      line-height: 20px;
+    }
+    >div {
+      float: right;
+      :global {
+        .ant-avatar {
+          width: 20px;
+          height: 20px;
+          line-height: 20px;
+          margin-left: -8px;
+          vertical-align: top;
+        }
+      }
+    }
+  }
+}
