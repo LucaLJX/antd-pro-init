@@ -4,10 +4,9 @@
  * https://github.com/ant-design/ant-design-pro-layout
  */
 import ProLayout from '@ant-design/pro-layout';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'umi/link';
 import { connect } from 'dva';
-import { formatMessage } from 'umi-plugin-react/locale';
 import Authorized from '@/utils/Authorized';
 import RightContent from '@/components/GlobalHeader/RightContent';
 import { isAntDesignPro } from '@/utils/utils';
@@ -22,9 +21,14 @@ const menuDataRender = menuList =>
     return Authorized.check(item.authority, localItem, null);
   });
 
+/**
+ * 页脚的渲染方法，返回null
+ * @param {*} _
+ * @param {*} defaultDom 默认的返回dom
+ */
 const footerRender = (_, defaultDom) => {
   if (!isAntDesignPro()) {
-    return defaultDom;
+    return null;
   }
 
   return (
@@ -49,21 +53,43 @@ const footerRender = (_, defaultDom) => {
 };
 
 const BasicLayout = props => {
-  const { dispatch, children, settings } = props;
+  const {
+    dispatch,
+    children,
+    settings,
+    match: { params: { id } },
+    basicLayout: { menuData }
+  } = props;
   /**
    * constructor
    */
 
-  useEffect(() => {
+  // useEffect(() => {
+  //   console.log('useEffect')
+  //   if (dispatch) {
+  //     dispatch({
+  //       type: 'basicLayout/getMenu'
+  //     })
+  //   }
+  // });
+
+  /**
+   * 获取动态菜单
+   */
+  useState(() => {
     if (dispatch) {
       dispatch({
-        type: 'user/fetchCurrent',
+        type: 'basicLayout/getMenu',
+        payload: {
+          projectId: id
+        }
       });
-      dispatch({
-        type: 'settings/getSetting',
-      });
+      // dispatch({
+      //   type: 'settings/getSetting',
+      // });
     }
-  }, []);
+  });
+  
   /**
    * init variables
    */
@@ -77,28 +103,24 @@ const BasicLayout = props => {
 
   return (
     <ProLayout
-      logo={logo}
+      logo={null}
+      title={'易制片'}
+      menu={{ locale: false }}
       onCollapse={handleMenuCollapse}
       menuItemRender={(menuItemProps, defaultDom) => {
         if (menuItemProps.isUrl) {
           return defaultDom;
         }
 
-        return <Link to={menuItemProps.path}>{defaultDom}</Link>;
+        return <Link to={menuItemProps.path.replace(/:id/, id)}>{defaultDom}</Link>;
       }}
       breadcrumbRender={(routers = []) => [
-        {
-          path: '/',
-          breadcrumbName: formatMessage({
-            id: 'menu.home',
-            defaultMessage: 'Home',
-          }),
-        },
-        ...routers,
+        ...routers
       ]}
       footerRender={footerRender}
-      menuDataRender={menuDataRender}
-      formatMessage={formatMessage}
+      menuDataRender={() => menuData}
+      // menuDataRender={menuDataRender}
+      formatMessage={null}
       rightContentRender={rightProps => <RightContent {...rightProps} />}
       {...props}
       {...settings}
@@ -108,7 +130,8 @@ const BasicLayout = props => {
   );
 };
 
-export default connect(({ global, settings }) => ({
+export default connect(({ global, settings, basicLayout }) => ({
   collapsed: global.collapsed,
   settings,
+  basicLayout
 }))(BasicLayout);

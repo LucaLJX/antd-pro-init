@@ -17,7 +17,7 @@ const GlobalHeaderRight = props => {
 
   return (
     <div className={className}>
-      <HeaderSearch
+      {/* <HeaderSearch
         className={`${styles.action} ${styles.search}`}
         placeholder={formatMessage({
           id: 'component.globalHeader.search',
@@ -39,8 +39,8 @@ const GlobalHeaderRight = props => {
         onPressEnter={value => {
           console.log('enter', value);
         }}
-      />
-      <Tooltip
+      /> */}
+      {/* <Tooltip
         title={formatMessage({
           id: 'component.globalHeader.help',
         })}
@@ -53,9 +53,9 @@ const GlobalHeaderRight = props => {
         >
           <Icon type="question-circle-o" />
         </a>
-      </Tooltip>
+      </Tooltip> */}
       <Avatar />
-      <SelectLang className={styles.action} />
+      {/* <SelectLang className={styles.action} /> */}
     </div>
   );
 };
