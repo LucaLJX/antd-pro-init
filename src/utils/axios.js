@@ -17,6 +17,7 @@ const instance = axios.create({
   transformRequest: [data => {
     // 对 data 进行任意转换处理
     return Qs.stringify(data); // 编码格式
+    // return data
   }],
 });
 
@@ -46,5 +47,25 @@ instance.interceptors.response.use(response => {
   // 例如用户请求失效，返回登录页什么的
   return Promise.reject(error);
 });
+
+// export const formRequest = new instance({
+//   headers: {
+//     'Content-Type': 'application/x-www-form-urlencoded',
+//   },
+//   transformRequest: [data => {
+//     // 对 data 进行任意转换处理
+//     return Qs.stringify(data)
+//   }]
+// })
+
+// export const jsonRequest = new instance({
+//   headers: {
+//     'Content-Type': 'application/json',
+//   },
+//   transformRequest: [data => {
+//     // 对 data 进行任意转换处理
+//     return data // 编码格式
+//   }]
+// })
 
 export default instance;
