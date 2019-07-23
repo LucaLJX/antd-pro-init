@@ -67,7 +67,7 @@ class LoginLayout extends Component {
                 userName: values.name
               }
             })
-            axios.defaults.headers.token = res.data.token;
+            // axios.defaults.headers.token = res.data.token;
             window.localStorage.setItem('token', res.data.token);
             window.localStorage.setItem('userName', values.name);
           }

@@ -1,9 +1,11 @@
 import React from 'react'
 import { connect } from 'dva'
 import styles from './index.less'
-import { Layout, Row, Col, Button, Modal, Form, Select, Input, Table, Pagination } from 'antd'
+import { Layout, Row, Col, Button, Modal, Form, Select, Input, Table, Pagination, Tag } from 'antd'
 import ProjectCard from '@/components/ProjectCard'
+import _ from 'lodash'
 
+const { Column, ColumnGroup } = Table
 
 @connect(({ senceManage }) => ({ senceManage }))
 @Form.create()
@@ -15,7 +17,7 @@ export default class ProjectList extends React.Component {
       searchParams: {
         projectId: null,
         pageIndex: 0,
-        pageNum: 10,
+        pageNum: 20,
         addActor: false
       }
     }
@@ -30,7 +32,6 @@ export default class ProjectList extends React.Component {
   // 获取表格数据
   getSenceData () {
     const { dispatch } = this.props
-    console.log(this.props)
     const params = this.state.searchParams
     dispatch({
       type: 'senceManage/getSenceData',
@@ -69,31 +70,6 @@ export default class ProjectList extends React.Component {
     this.state.searchParams.pageNum = size
     this.state.searchParams.pageIndex = current - 1
     this.getSenceData()
-  }
-
-  // 处理表头
-  formatColumns (list) {
-    if (!list) {
-      return []
-    }
-    const columns = []
-    for (let i = 0; i < list.length; i++) {
-      const listItem = list[i];
-      if (listItem.columnKey && !listItem.subColumns) {
-        columns.push({
-          title: listItem.columnName,
-          dataIndex: listItem.columnKey
-        })
-      } else {
-        listItem.subColumns.map((item) => {
-          columns.push({
-            title: item.columnName,
-            dataIndex: item.columnKey
-          })
-        })
-      }
-    }
-    return columns
   }
 
   // 取消添加角色
@@ -139,10 +115,132 @@ export default class ProjectList extends React.Component {
         <Table
           bordered
           scroll={{x: true}}
-          columns={this.formatColumns(senceHeader)}
-          dataSource={senceList} size="small"
+          dataSource={senceList} size='small'
           pagination={false}
-          />
+          >
+          {
+            (senceHeader && senceHeader.length !== 0) &&
+            senceHeader.map((item, i) => {
+              // 一级菜单
+              if (item.columnKey && !item.subColumns) {
+                if (item.columnName === '特约') {
+                  // 特约 根据场的id获取table中的对应场
+                  return <Column
+                    width='auto'
+                    style={{
+                      minWidth: '50px',
+                      display: 'block',
+                      whiteSpace: 'nowrap'
+                    }}
+                    title={item.columnName}
+                    dataIndex={'characterFreelance'}
+                    key={item.columnKey + i + '特约'}
+                    render={(data) => {
+                      if (data && data.length !== 0) {
+                        return data.map((tagItem, x) => <Tag key={tagItem.fullName + x}>{ tagItem.fullName }</Tag>)
+                      }
+                      return <div
+                      style={{
+                        minWidth: '50px'
+                      }}
+                      ></div>
+                    }}
+                    />
+                } else if (item.columnName === '群演') {
+                  // 群演 根据场的id获取table中的对应场
+                  return <Column
+                    style={{
+                      minWidth: '50px',
+                      display: 'block',
+                      whiteSpace: 'nowrap'
+                    }}
+                    width='auto'
+                    title={item.columnName}
+                    dataIndex={'characterGroup'}
+                    key={item.columnKey + i}
+                    render={(data) => {
+                      if (data && data.length !== 0) {
+                        return data.map((tagItem, z) => <Tag key={tagItem.fullName + z}>{ tagItem.fullName }</Tag>)
+                      }
+                      return <div
+                      style={{
+                        minWidth: '50px'
+                      }}
+                      ></div>
+                    }}
+                    />
+                } else {
+                  return <Column width='auto' title={item.columnName}  dataIndex={item.columnKey} key={item.columnKey + i}
+                  render={data => {
+                    return <p
+                    style={{
+                      minWidth: '50px',
+                      display: 'block',
+                      whiteSpace: 'nowrap'
+                    }}
+                    >{ data }</p>
+                  }}
+                  />
+                }
+              } else if (item.columnName === 'location') {
+                // 场次 根据场的id获取table中的对应场
+                return item.subColumns.map((subItem, j) => {
+                  const locationId = Number((subItem.columnKey.split('-'))[1])
+                  return <Column
+                    width='auto'
+                    title={subItem.columnName}
+                    dataIndex={'location'}
+                    key={'sub' + subItem.columnKey + i + j}
+                    render={(data) => {
+                      const arr = _.filter(data, item => item.columnId === locationId)
+                      return arr.map((tagItem, y) => <p
+                        style={{
+                          minWidth: '50px',
+                          display: 'block',
+                          whiteSpace: 'nowrap'
+                        }}
+                        key={ tagItem.locationName + y }>{ tagItem.locationName }</p>)
+                    }}
+                    />
+                })
+              } else if (item.columnName === 'charact') {
+                // 主演 根据场的id获取table中的对应场
+                return item.subColumns.map((subItem, q) => {
+                  const charactId = Number((subItem.columnKey.split('-'))[1])
+                  return <Column
+                    width='auto'
+                    title={subItem.columnName}
+                    dataIndex={'characterHead'}
+                    key={'sub' + subItem.columnKey + i + q}
+                    render={(data) => {
+                      const arr = _.filter(data, item => item.id === charactId)
+                      if (arr && arr.length !== 0) {
+                        return arr.map((tagItem, u) => <p
+                          style={{
+                            minWidth: '50px',
+                            display: 'block',
+                            whiteSpace: 'nowrap'
+                          }}
+                          key={ tagItem.statusName 
+                            + u }>{ tagItem.statusName 
+                            }</p>)
+                      }
+                      return <div
+                      style={{
+                        minWidth: '50px'
+                      }}
+                      ></div>
+                    }}
+                  />
+                })
+              } else {
+                return item.subColumns.map((subItem, j) => {
+                  return <Column width='auto' title={subItem.columnName} dataIndex={subItem.columnKey} key={'sub' + subItem.columnKey + i + j} />
+                })
+              }
+            })
+          }
+        </Table>
         {/* table page */}
         <div className={styles.PageWrapper}>
           <Pagination
@@ -158,58 +256,7 @@ export default class ProjectList extends React.Component {
             onShowSizeChange={(current, size) => this.changePageSize(current, size)}
             />
         </div>
-        {/* 创建角色 */}
-        {/* <Modal
-          visible={this.state.addActor}
-          title={`添加角色`}
-          okText='添加'
-          cancelText='取消'
-          onCancel={this.addActorCancel}
-          onOk={this.addActorConfirm}>
-          <Form>
-            <Form.Item {...formItemLayout} label='性别:'>
-              {getFieldDecorator('gender', {
-                initialValue: actorGenderType[0].value,
-                hidden: !this.state.addActor
-              })(
-                <Select placeholder='请选择性别'>
-                  {actorGenderType.map((item, index) => {
-                    return <Select.Option value={item.value}>{item.label}</Select.Option>
-                  })}
-                </Select>
-              )}
-            </Form.Item>
-            <Form.Item {...formItemLayout} label='全称:'>
-              {getFieldDecorator('fullName', {
-                rules: [{ type: 'string', required: true, message: '全称不能为空' }, { validator: this.checkActorName }],
-                validateFirst: true,
-                validateTrigger: 'onChange',
-                hidden: !this.state.addActor
-              })(
-                <Input placeholder='请输入全称' />
-              )}
-            </Form.Item>
-            <Form.Item {...formItemLayout} label='简称:'>
-              {getFieldDecorator('shortName', {
-                rules: [{ type: 'string', required: true, message: '简称不能为空' }, { validator: this.checkActorName }],
-                validateFirst: true,
-                validateTrigger: 'onChange',
-                hidden: !this.state.addActor
-              })(
-                <Input placeholder='请输入简称' />
-              )}
-            </Form.Item> */}
-            {/* <Form.Item {...formItemLayout} label='别名:'>
-              {getFieldDecorator('alias', {
-                rules: [{ type: 'string', required: true, message: '别名不能为空' }],
-                hidden: !this.state.addActor
-              })(
-                <Input placeholder='请输入别名' />
-              )}
-            </Form.Item> */}
-          {/* </Form>
-        </Modal> */}
       </div>
-    );
+    )
   }
 }
