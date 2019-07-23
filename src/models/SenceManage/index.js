@@ -88,6 +88,12 @@ const initOldTableData = async (data, projectId) => {
       space: node.space,
       time: node.time,
       summary: node.summary,
+      location: [
+        {
+          locationName: node.location,
+          columnId: 15
+        }
+      ]
     }
     // 找群演 type 为 2 
     let type_2_arr = []
@@ -193,18 +199,39 @@ const Model = {
       const sences = await initOldTableData(oldTableData, payload)
       console.log('sences')
       console.log(sences)
-      await createSence({
-        "projectId":"2facc298dc7246e89c65ad426b2b4195",
-        "episodeNum":"60",
-        "sceneNum":"1",
-        "summary":"测试测试",
-        "time":"日",
-        "space":"内",
-        "wenPage":"0.1",
-        "characterHead":[{"id":8937}],
-        "characterFreelance":[{"id":"9210"}],
-        "characterGroup":[{"id":"9031"}]
-      })
+      // await createSence({
+      //   "projectId":"2facc298dc7246e89c65ad426b2b4195",
+      //   "episodeNum":"60",
+      //   "sceneNum":"1",
+      //   "summary":"测试测试",
+      //   "time":"日",
+      //   "space":"内",
+      //   "wenPage":"0.1",
+      //   "characterHead":[{"id":8937}],
+      //   "characterFreelance":[{"id":"9210"}],
+      //   "characterGroup":[{"id":"9031"}]
+      // })
+      const testParam = {
+        projectId: '2facc298dc7246e89c65ad426b2b4195',
+        episodeNum: '70',
+        sceneNum: '11',
+        summary: '测试测试',
+        space: '内',
+        time: '日',
+        wuPage: '0.1',
+        wenPage: '0.1',
+        characterGroup: [{
+          id: 9031
+        }],
+        characterFreelance: [{
+          id: 9210
+        }],
+        characterHead: [{
+          id: 8937
+        }]
+        
+      }
+      // await createSence(testParam)
       return 
       for (let i = 0; i < sences.length; i++) {
         const node = sences[i]
