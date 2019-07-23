@@ -1,8 +1,8 @@
-import axios from '@/utils/axios'
+import { http } from '@/utils/http'
 
 // 获取左侧菜单
 export function getMenu(params) {
-  return axios.post('/web/easyaction/user/queryMenu', params);
+  return http.postRequestParam('/web/easyaction/user/queryMenu', params)
   return [
     {
       path: '/project/:id',
