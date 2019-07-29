@@ -115,11 +115,11 @@ export default {
       routes: [
         {
           path: '/project/:id',
-          redirect: '/project/:id/detail'
+          redirect: '/project/:id/dashboard'
         },
         {
-          path: '/project/:id/detail',
-          name: '控制台',
+          path: '/project/:id/dashboard',
+          name: '',
           component: './Base',
         },
       ],

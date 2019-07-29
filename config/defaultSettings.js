@@ -3,9 +3,9 @@ export default {
   primaryColor: '#1890FF',
   layout: 'sidemenu',
   contentWidth: 'Fluid',
-  fixedHeader: false,
+  fixedHeader: true, // 原为false
   autoHideHeader: false,
-  fixSiderbar: false,
+  fixSiderbar: true, // 原为false
   colorWeak: false,
   menu: {
     locale: false,
@@ -13,4 +13,5 @@ export default {
   title: '易制片',
   pwa: false,
   iconfontUrl: '',
+  collapse: false
 };
