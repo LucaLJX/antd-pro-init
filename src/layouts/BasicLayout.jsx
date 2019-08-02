@@ -3,23 +3,27 @@
  * You can view component api by:
  * https://github.com/ant-design/ant-design-pro-layout
  */
-import ProLayout from '@ant-design/pro-layout';
-import React, { useEffect, useState } from 'react';
-import Link from 'umi/link';
-import { connect } from 'dva';
-import Authorized from '@/utils/Authorized';
-import RightContent from '@/components/GlobalHeader/RightContent';
-import { isAntDesignPro } from '@/utils/utils';
-import logo from '../assets/logo.svg';
+import ProLayout, { PageHeaderWrapper } from '@ant-design/pro-layout'
+import React, { useEffect, useState } from 'react'
+import Link from 'umi/link'
+import { connect } from 'dva'
+import Authorized from '@/utils/Authorized'
+import RightContent from '@/components/GlobalHeader/RightContent'
+import { isAntDesignPro } from '@/utils/utils'
+import logo from '../assets/logo.svg'
+import router from 'umi/router'
+import styles from './BasicLayout.less'
+import { Menu, Dropdown, Icon, message, Avatar } from 'antd'
 
 /**
  * use Authorized check all menu item
  */
 const menuDataRender = menuList =>
   menuList.map(item => {
-    const localItem = { ...item, children: item.children ? menuDataRender(item.children) : [] };
-    return Authorized.check(item.authority, localItem, null);
-  });
+    const localItem = { ...item, children: item.children ? menuDataRender(item.children) : [] }
+    return Authorized.check(item.authority, localItem, null)
+  })
+
 
 /**
  * 页脚的渲染方法，返回null
@@ -28,7 +32,7 @@ const menuDataRender = menuList =>
  */
 const footerRender = (_, defaultDom) => {
   if (!isAntDesignPro()) {
-    return null;
+    return null
   }
 
   return (
@@ -49,8 +53,8 @@ const footerRender = (_, defaultDom) => {
         </a>
       </div>
     </>
-  );
-};
+  )
+}
 
 const BasicLayout = props => {
   const {
@@ -58,20 +62,63 @@ const BasicLayout = props => {
     children,
     settings,
     match: { params: { id } },
-    basicLayout: { menuData }
-  } = props;
+    basicLayout: {
+      menuData,
+      nickName,
+      avatarUrl
+    },
+  } = props
   /**
    * constructor
    */
 
-  // useEffect(() => {
-  //   console.log('useEffect')
-  //   if (dispatch) {
-  //     dispatch({
-  //       type: 'basicLayout/getMenu'
-  //     })
-  //   }
-  // });
+  /**
+   * 登出
+   */
+  const logout = () => {
+    if (dispatch) {
+      dispatch({
+        type: 'basicLayout/logout',
+        payload: {},
+        callback: res => {
+         if (res.code === 0) {
+          // 登出成功
+          message.success('登出成功！')
+          window.localStorage.removeItem('token')
+          window.localStorage.removeItem('userName')
+          router.push('/login')
+         }
+        }
+      })
+    }
+  }
+
+  const menu = (
+    <Menu>
+      <Menu.Item onClick={() => logout()}>
+        登出
+      </Menu.Item>
+    </Menu>
+  )
+
+  /**
+   * 页头的渲染方法，返回null
+   * @param {*} _
+   * @param {*} defaultDom 默认的返回dom
+   */
+  const headerRender = (_, defaultDom) => {
+    return (
+      <div className={styles.commonHeader}>
+        <Dropdown className={styles.DropdownWrapper} overlay={menu}>
+          <a href='#'>
+            <Avatar className={styles.avatar} src={avatarUrl} />
+            <span className={styles.nickName}>{nickName}</span>
+            <Icon type="down" />
+          </a>
+        </Dropdown>
+      </ div>
+    )
+  }
 
   /**
    * 获取动态菜单
@@ -83,13 +130,14 @@ const BasicLayout = props => {
         payload: {
           projectId: id
         }
-      });
-      // dispatch({
-      //   type: 'settings/getSetting',
-      // });
+      })
+      dispatch({
+        type: 'basicLayout/getInfo',
+        payload: {}
+      })
     }
-  });
-  
+  })
+
   /**
    * init variables
    */
@@ -99,39 +147,57 @@ const BasicLayout = props => {
     dispatch({
       type: 'global/changeLayoutCollapsed',
       payload,
-    });
+    })
 
   return (
     <ProLayout
-      logo={null}
-      title={'易制片'}
+      trigger={null}
+      logo={() => (
+        <img onClick={() => {
+          router.push(`/list`)
+        }} src={require('@/assets/LOGOBULE.png')} alt='' />
+      )}
+      siderWidth={200}
       menu={{ locale: false }}
       onCollapse={handleMenuCollapse}
       menuItemRender={(menuItemProps, defaultDom) => {
         if (menuItemProps.isUrl) {
-          return defaultDom;
+          return defaultDom
         }
 
-        return <Link to={menuItemProps.path.replace(/:id/, id)}>{defaultDom}</Link>;
+        return <Link to={menuItemProps.path.replace(/:id/, id)}>{defaultDom}</Link>
       }}
-      breadcrumbRender={(routers = []) => [
-        ...routers
-      ]}
+      breadcrumbRender={(routers = []) => {
+        return [
+          {
+            path: '/list',
+            breadcrumbName: '首页',
+          },
+          ...routers,
+        ]
+      }}
+      headerRender={headerRender}
       footerRender={footerRender}
       menuDataRender={() => menuData}
-      // menuDataRender={menuDataRender}
       formatMessage={null}
       rightContentRender={rightProps => <RightContent {...rightProps} />}
       {...props}
       {...settings}
+      title={''}
+      collapse={false}
+      fixSiderbar={true}
     >
+      {/* PageHeaderWrapper， 不添加则无法展示面包屑 */}
+      <PageHeaderWrapper />
+      {/* 登出 */}
+      <div className={styles.Person}></div>
       {children}
     </ProLayout>
-  );
-};
+  )
+}
 
 export default connect(({ global, settings, basicLayout }) => ({
   collapsed: global.collapsed,
   settings,
   basicLayout
-}))(BasicLayout);
+}))(BasicLayout)

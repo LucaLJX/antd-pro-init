@@ -3,7 +3,6 @@ import { connect } from 'dva';
 import router from 'umi/router';
 import { Card, Avatar } from 'antd';
 import styles from './index.less';
-
 const { Meta } = Card;
 
 class ProjectCard extends Component {

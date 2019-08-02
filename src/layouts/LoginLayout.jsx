@@ -3,7 +3,6 @@ import { connect } from 'dva';
 import { routerRedux } from 'dva/router';
 import { Form, Icon, Input, Button, Checkbox, Tabs } from 'antd'
 import defaultSettings from '../../config/defaultSettings';
-import axios from '@/utils/axios';
 import styles from './Layout.less';
 
 const FormItem = Form.Item;
@@ -44,7 +43,7 @@ class LoginLayout extends Component {
       if (err) {
         return;
       }
-      // 以下写死调用
+      // 前端联调：以下写死调用
       // axios.defaults.headers.token = 'b2f8491f52e54c8d9a0ba53c4f00b056'
       // window.localStorage.setItem('token', 'b2f8491f52e54c8d9a0ba53c4f00b056');
       // window.localStorage.setItem('userName', values.name);
@@ -67,7 +66,6 @@ class LoginLayout extends Component {
                 userName: values.name
               }
             })
-            // axios.defaults.headers.token = res.data.token;
             window.localStorage.setItem('token', res.data.token);
             window.localStorage.setItem('userName', values.name);
           }

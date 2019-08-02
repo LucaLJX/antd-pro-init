@@ -11,6 +11,65 @@ const Router = require('dva/router').routerRedux.ConnectedRouter;
 const routes = [
   {
     "path": "/",
+    "redirect": "/list",
+    "exact": true
+  },
+  {
+    "path": "/login",
+    "component": __IS_BROWSER
+    ? _dvaDynamic({
+      
+      component: () => import(/* webpackChunkName: "layouts__LoginLayout" */'../../layouts/LoginLayout'),
+      LoadingComponent: require('/Users/luca_ljx/LJX/others/PRO/FM/cxykz/lukai/antd-pro-init/src/components/PageLoading/index').default,
+    })
+    : require('../../layouts/LoginLayout').default,
+    "exact": true
+  },
+  {
+    "path": "/list",
+    "component": __IS_BROWSER
+    ? _dvaDynamic({
+      
+      component: () => import(/* webpackChunkName: "layouts__UserLayout" */'../../layouts/UserLayout'),
+      LoadingComponent: require('/Users/luca_ljx/LJX/others/PRO/FM/cxykz/lukai/antd-pro-init/src/components/PageLoading/index').default,
+    })
+    : require('../../layouts/UserLayout').default,
+    "Routes": [require('../Authorized').default],
+    "authority": [
+      "admin",
+      "user"
+    ],
+    "routes": [
+      {
+        "path": "/list",
+        "name": "welcome",
+        "icon": "",
+        "component": __IS_BROWSER
+    ? _dvaDynamic({
+      
+      component: () => import(/* webpackChunkName: "p__ProjectList__index" */'../ProjectList/index'),
+      LoadingComponent: require('/Users/luca_ljx/LJX/others/PRO/FM/cxykz/lukai/antd-pro-init/src/components/PageLoading/index').default,
+    })
+    : require('../ProjectList/index').default,
+        "exact": true
+      },
+      {
+        "component": __IS_BROWSER
+    ? _dvaDynamic({
+      
+      component: () => import(/* webpackChunkName: "p__404" */'../404'),
+      LoadingComponent: require('/Users/luca_ljx/LJX/others/PRO/FM/cxykz/lukai/antd-pro-init/src/components/PageLoading/index').default,
+    })
+    : require('../404').default,
+        "exact": true
+      },
+      {
+        "component": () => React.createElement(require('/Users/luca_ljx/LJX/others/PRO/FM/cxykz/lukai/antd-pro-init/node_modules/umi-build-dev/lib/plugins/404/NotFound.js').default, { pagesPath: 'src/pages', hasRoutesInConfig: true })
+      }
+    ]
+  },
+  {
+    "path": "/project/:id",
     "component": __IS_BROWSER
     ? _dvaDynamic({
       
@@ -25,8 +84,63 @@ const routes = [
     ],
     "routes": [
       {
-        "path": "/",
-        "name": "welcome",
+        "path": "/project/:id",
+        "redirect": "/project/:id/dashboard",
+        "exact": true
+      },
+      {
+        "path": "/project/:id/dashboard",
+        "name": "",
+        "component": __IS_BROWSER
+    ? _dvaDynamic({
+      
+      component: () => import(/* webpackChunkName: "p__Base" */'../Base'),
+      LoadingComponent: require('/Users/luca_ljx/LJX/others/PRO/FM/cxykz/lukai/antd-pro-init/src/components/PageLoading/index').default,
+    })
+    : require('../Base').default,
+        "exact": true
+      },
+      {
+        "component": () => React.createElement(require('/Users/luca_ljx/LJX/others/PRO/FM/cxykz/lukai/antd-pro-init/node_modules/umi-build-dev/lib/plugins/404/NotFound.js').default, { pagesPath: 'src/pages', hasRoutesInConfig: true })
+      }
+    ]
+  },
+  {
+    "path": "/overall/:id",
+    "component": __IS_BROWSER
+    ? _dvaDynamic({
+      
+      component: () => import(/* webpackChunkName: "layouts__BasicLayout" */'../../layouts/BasicLayout'),
+      LoadingComponent: require('/Users/luca_ljx/LJX/others/PRO/FM/cxykz/lukai/antd-pro-init/src/components/PageLoading/index').default,
+    })
+    : require('../../layouts/BasicLayout').default,
+    "Routes": [require('../Authorized').default],
+    "authority": [
+      "admin",
+      "user"
+    ],
+    "routes": [
+      {
+        "path": "/overall/:id",
+        "redirect": "/overall/:id/sence",
+        "exact": true
+      },
+      {
+        "path": "/overall/:id/sence",
+        "name": "顺场表",
+        "icon": "smile",
+        "component": __IS_BROWSER
+    ? _dvaDynamic({
+      
+      component: () => import(/* webpackChunkName: "p__Overall__SenceManage" */'../Overall/SenceManage'),
+      LoadingComponent: require('/Users/luca_ljx/LJX/others/PRO/FM/cxykz/lukai/antd-pro-init/src/components/PageLoading/index').default,
+    })
+    : require('../Overall/SenceManage').default,
+        "exact": true
+      },
+      {
+        "path": "/project/:id/welcome",
+        "name": "哈哈哈",
         "icon": "smile",
         "component": __IS_BROWSER
     ? _dvaDynamic({

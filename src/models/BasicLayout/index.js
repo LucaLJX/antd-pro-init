@@ -1,45 +1,48 @@
-import { getMenu } from '@/services/BasicLayout'
+import { getMenu, logout, getInfo } from '@/services/BasicLayout'
 
 const Model = {
   namespace: 'basicLayout',
   state: {
     projectListData: [],
     projectTypesData: [],
-    menuData: []
+    menuData: [],
+    breadcrumbData: [],
+    nickName: '',
+    avatarUrl: ''
   },
   effects: {
+    *getInfo ({ payload, callback }, { call, put }) {
+      const data = yield call(getInfo, payload)
+      const res = data.data.data
+      yield put({
+        type: 'save',
+        payload: {
+          nickName: res.nickName,
+          avatarUrl: res.avatarUrl
+        }
+      })
+    },
+    *logout ({ payload, callback }, { call, put }) {
+      const data = yield call(logout, payload)
+      if (callback && data.data.code === 0) {
+        callback({ code: 0 })
+      }
+    },
     *getMenu ({ payload, callback }, { call, put }) {
-      console.log('getMenu')
       const data = yield call(getMenu, payload)
-      console.log(data)
-      // -------
-      // todo: del
-      // yield put({
-      //   type: 'save',
-      //   payload: {
-      //     menuData: data
-      //     // menuData: []
-      //   }
-      // })
-      // return 
-      // ------
       const list = data.data.data
       const menuData = list.map((item) => {
         if (item.name && item.path) {
+          if (item.path.substring(0, 1) !== '/') {
+            item.path = '/' + item.path
+          }
           return item
         }
       })
-      menuData.unshift({
-        path: '/project/:id',
-        name: '控制台',
-        icon: 'fund'
-      })
-      console.log(menuData)
       yield put({
         type: 'save',
         payload: {
           menuData: menuData
-          // menuData: []
         }
       })
     },
