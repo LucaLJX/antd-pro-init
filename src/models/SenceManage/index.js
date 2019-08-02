@@ -18,6 +18,15 @@ const Model = {
     header: []
   },
   effects: {
+    *clearHeader ({ payload, callback }, { call, put }) {
+      yield put({
+        type: 'save',
+        payload: {
+          header: [],
+          getHeader: false
+        }
+      })
+    },
     *setHeader ({ payload, callback }, { call, put }) {
       yield put({
         type: 'save',

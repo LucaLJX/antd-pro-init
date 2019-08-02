@@ -24,11 +24,23 @@ export default class ProjectList extends React.Component {
     }
   }
 
-  // 初始化
-  componentDidMount() {
+  componentWillMount () {
     const { dispatch, match: {params: {id}} } = this.props
     this.state.searchParams.projectId = id
     this.getSenceData()
+  }
+
+  componentWillUnmount () {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'senceManage/clearHeader',
+      payload: {},
+    })
+  }
+
+  // 初始化
+  componentDidMount() {
+    console.log('componentDidMount')
   }
 
   // 获取表格数据
@@ -193,8 +205,9 @@ export default class ProjectList extends React.Component {
           const locationId = Number((subItem.columnKey.split('-'))[1])
           list.push({
             title: this.getHeader(subItem.columnName),
-            dataIndex: 'location',
-            render: (data, record) => {
+            dataIndex: 'location' + j,
+            render: (_data, record) => {
+              const data = record.location
               const arr = _.filter(data, locationItem => {
                 return locationItem.columnId === locationId
               })
