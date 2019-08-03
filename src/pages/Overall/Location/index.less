@@ -1,0 +1,41 @@
+.wrapper {
+  height: calc(100vh - 180px);
+  position: relative;
+}
+
+.ContentWrapper {
+  display: flex;
+  flex-direction: row;
+}
+
+.Left {
+  width: 200px;
+  height: calc(100vh - 200px);
+  :global {
+    .ant-card {
+      margin-right: 10px;
+      height: 100%;
+    }
+  }
+}
+
+.Middle {
+  height: calc(100vh - 200px);
+  flex:1;
+  :global {
+    .ant-card {
+      margin-bottom: 10px;
+    }
+  }
+}
+
+.Right {
+  width: 300px;
+  height: calc(100vh - 200px);
+  :global {
+    .ant-card {
+      margin-left: 10px;
+      height: 100%;
+    }
+  }
+}
