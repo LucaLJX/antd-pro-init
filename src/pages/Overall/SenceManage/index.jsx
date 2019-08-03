@@ -9,7 +9,7 @@ const { Column, ColumnGroup } = Table
 
 @connect(({ senceManage }) => ({ senceManage }))
 @Form.create()
-export default class ProjectList extends React.Component {
+export default class SenceManage extends React.Component {
   constructor(props) {
     super(props)
     this.state = {

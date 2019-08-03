@@ -136,16 +136,34 @@ export default {
           redirect: '/overall/:id/sence'
         },
         {
+          path: '/overall/:id/script',
+          name: '剧本',
+          icon: 'smile',
+          component: './Overall/Script',
+        },
+        {
           path: '/overall/:id/sence',
           name: '顺场表',
           icon: 'smile',
           component: './Overall/SenceManage',
         },
         {
-          path: '/project/:id/welcome',
-          name: '哈哈哈',
+          path: '/overall/:id/plan',
+          name: '大计划',
           icon: 'smile',
-          component: './Welcome',
+          component: './Overall/Plan',
+        },
+        {
+          path: '/overall/:id/location',
+          name: '场景',
+          icon: 'smile',
+          component: './Overall/Location',
+        },
+        {
+          path: '/overall/:id/characters',
+          name: '角色',
+          icon: 'smile',
+          component: './Overall/Characters',
         },
         {
           component: './404',

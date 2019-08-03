@@ -126,6 +126,19 @@ const routes = [
         "exact": true
       },
       {
+        "path": "/overall/:id/script",
+        "name": "剧本",
+        "icon": "smile",
+        "component": __IS_BROWSER
+    ? _dvaDynamic({
+      
+      component: () => import(/* webpackChunkName: "p__Overall__Script" */'../Overall/Script'),
+      LoadingComponent: require('/Users/luca_ljx/LJX/others/PRO/FM/cxykz/lukai/antd-pro-init/src/components/PageLoading/index').default,
+    })
+    : require('../Overall/Script').default,
+        "exact": true
+      },
+      {
         "path": "/overall/:id/sence",
         "name": "顺场表",
         "icon": "smile",
@@ -139,16 +152,42 @@ const routes = [
         "exact": true
       },
       {
-        "path": "/project/:id/welcome",
-        "name": "哈哈哈",
+        "path": "/overall/:id/plan",
+        "name": "大计划",
         "icon": "smile",
         "component": __IS_BROWSER
     ? _dvaDynamic({
       
-      component: () => import(/* webpackChunkName: "p__Welcome" */'../Welcome'),
+      component: () => import(/* webpackChunkName: "p__Overall__Plan" */'../Overall/Plan'),
       LoadingComponent: require('/Users/luca_ljx/LJX/others/PRO/FM/cxykz/lukai/antd-pro-init/src/components/PageLoading/index').default,
     })
-    : require('../Welcome').default,
+    : require('../Overall/Plan').default,
+        "exact": true
+      },
+      {
+        "path": "/overall/:id/location",
+        "name": "场景",
+        "icon": "smile",
+        "component": __IS_BROWSER
+    ? _dvaDynamic({
+      
+      component: () => import(/* webpackChunkName: "p__Overall__Location" */'../Overall/Location'),
+      LoadingComponent: require('/Users/luca_ljx/LJX/others/PRO/FM/cxykz/lukai/antd-pro-init/src/components/PageLoading/index').default,
+    })
+    : require('../Overall/Location').default,
+        "exact": true
+      },
+      {
+        "path": "/overall/:id/characters",
+        "name": "角色",
+        "icon": "smile",
+        "component": __IS_BROWSER
+    ? _dvaDynamic({
+      
+      component: () => import(/* webpackChunkName: "p__Overall__Characters" */'../Overall/Characters'),
+      LoadingComponent: require('/Users/luca_ljx/LJX/others/PRO/FM/cxykz/lukai/antd-pro-init/src/components/PageLoading/index').default,
+    })
+    : require('../Overall/Characters').default,
         "exact": true
       },
       {
