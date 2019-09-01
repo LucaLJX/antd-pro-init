@@ -3,27 +3,26 @@
  * You can view component api by:
  * https://github.com/ant-design/ant-design-pro-layout
  */
-import ProLayout, { PageHeaderWrapper } from '@ant-design/pro-layout'
-import React, { useEffect, useState } from 'react'
-import Link from 'umi/link'
-import { connect } from 'dva'
-import Authorized from '@/utils/Authorized'
-import RightContent from '@/components/GlobalHeader/RightContent'
-import { isAntDesignPro } from '@/utils/utils'
-import logo from '../assets/logo.svg'
-import router from 'umi/router'
-import styles from './BasicLayout.less'
-import { Menu, Dropdown, Icon, message, Avatar } from 'antd'
+import ProLayout, { PageHeaderWrapper } from '@ant-design/pro-layout';
+import React, { useEffect, useState } from 'react';
+import Link from 'umi/link';
+import { connect } from 'dva';
+import Authorized from '@/utils/Authorized';
+import RightContent from '@/components/GlobalHeader/RightContent';
+import { isAntDesignPro } from '@/utils/utils';
+import logo from '../assets/logo.svg';
+import router from 'umi/router';
+import styles from './BasicLayout.less';
+import { Menu, Dropdown, Icon, message, Avatar } from 'antd';
 
 /**
  * use Authorized check all menu item
  */
 const menuDataRender = menuList =>
   menuList.map(item => {
-    const localItem = { ...item, children: item.children ? menuDataRender(item.children) : [] }
-    return Authorized.check(item.authority, localItem, null)
-  })
-
+    const localItem = { ...item, children: item.children ? menuDataRender(item.children) : [] };
+    return Authorized.check(item.authority, localItem, null);
+  });
 
 /**
  * 页脚的渲染方法，返回null
@@ -32,7 +31,7 @@ const menuDataRender = menuList =>
  */
 const footerRender = (_, defaultDom) => {
   if (!isAntDesignPro()) {
-    return null
+    return null;
   }
 
   return (
@@ -45,29 +44,23 @@ const footerRender = (_, defaultDom) => {
         }}
       >
         <a href="https://www.netlify.com" target="_blank" rel="noopener noreferrer">
-          <img
-            src="https://www.netlify.com/img/global/badges/netlify-color-bg.svg"
-            width="82px"
-            alt="netlify logo"
-          />
+          <img src="https://www.netlify.com/img/global/badges/netlify-color-bg.svg" width="82px" alt="netlify logo" />
         </a>
       </div>
     </>
-  )
-}
+  );
+};
 
 const BasicLayout = props => {
   const {
     dispatch,
     children,
     settings,
-    match: { params: { id } },
-    basicLayout: {
-      menuData,
-      nickName,
-      avatarUrl
+    match: {
+      params: { id },
     },
-  } = props
+    basicLayout: { menuData, nickName, avatarUrl },
+  } = props;
   /**
    * constructor
    */
@@ -81,25 +74,23 @@ const BasicLayout = props => {
         type: 'basicLayout/logout',
         payload: {},
         callback: res => {
-         if (res.code === 0) {
-          // 登出成功
-          message.success('登出成功！')
-          window.localStorage.removeItem('token')
-          window.localStorage.removeItem('userName')
-          router.push('/login')
-         }
-        }
-      })
+          if (res.code === 0) {
+            // 登出成功
+            message.success('登出成功！');
+            window.localStorage.removeItem('token');
+            window.localStorage.removeItem('userName');
+            router.push('/login');
+          }
+        },
+      });
     }
-  }
+  };
 
   const menu = (
     <Menu>
-      <Menu.Item onClick={() => logout()}>
-        登出
-      </Menu.Item>
+      <Menu.Item onClick={() => logout()}>登出</Menu.Item>
     </Menu>
-  )
+  );
 
   /**
    * 页头的渲染方法，返回null
@@ -110,15 +101,15 @@ const BasicLayout = props => {
     return (
       <div className={styles.commonHeader}>
         <Dropdown className={styles.DropdownWrapper} overlay={menu}>
-          <a href='#'>
+          <a href="#">
             <Avatar className={styles.avatar} src={avatarUrl} />
             <span className={styles.nickName}>{nickName}</span>
             <Icon type="down" />
           </a>
         </Dropdown>
-      </ div>
-    )
-  }
+      </div>
+    );
+  };
 
   /**
    * 获取动态菜单
@@ -128,15 +119,15 @@ const BasicLayout = props => {
       dispatch({
         type: 'basicLayout/getMenu',
         payload: {
-          projectId: id
-        }
-      })
+          projectId: id,
+        },
+      });
       dispatch({
         type: 'basicLayout/getInfo',
-        payload: {}
-      })
+        payload: {},
+      });
     }
-  })
+  });
 
   /**
    * init variables
@@ -147,25 +138,29 @@ const BasicLayout = props => {
     dispatch({
       type: 'global/changeLayoutCollapsed',
       payload,
-    })
+    });
 
   return (
     <ProLayout
       trigger={null}
       logo={() => (
-        <img onClick={() => {
-          router.push(`/list`)
-        }} src={require('@/assets/LOGOBULE.png')} alt='' />
+        <img
+          onClick={() => {
+            router.push(`/list`);
+          }}
+          src="https://easyaction-file-1.oss-cn-hangzhou.aliyuncs.com/shot_photo/easyaction/logo/LOGOFULLB260.png"
+          alt=""
+        />
       )}
       siderWidth={200}
       menu={{ locale: false }}
       onCollapse={handleMenuCollapse}
       menuItemRender={(menuItemProps, defaultDom) => {
         if (menuItemProps.isUrl) {
-          return defaultDom
+          return defaultDom;
         }
 
-        return <Link to={menuItemProps.path.replace(/:id/, id)}>{defaultDom}</Link>
+        return <Link to={menuItemProps.path.replace(/:id/, id)}>{defaultDom}</Link>;
       }}
       breadcrumbRender={(routers = []) => {
         return [
@@ -174,7 +169,7 @@ const BasicLayout = props => {
             breadcrumbName: '首页',
           },
           ...routers,
-        ]
+        ];
       }}
       headerRender={headerRender}
       footerRender={footerRender}
@@ -193,11 +188,11 @@ const BasicLayout = props => {
       <div className={styles.Person}></div>
       {children}
     </ProLayout>
-  )
-}
+  );
+};
 
 export default connect(({ global, settings, basicLayout }) => ({
   collapsed: global.collapsed,
   settings,
-  basicLayout
-}))(BasicLayout)
+  basicLayout,
+}))(BasicLayout);

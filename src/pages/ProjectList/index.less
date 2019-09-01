@@ -1,13 +1,75 @@
-.createButton {
-  height: 32px;
-  width: 100%;
+.projectList {
+  padding-top: 40px;
+  max-width: 1300px;
+  margin: 0 auto;
+  position: relative;
+
   :global {
-    .ant-btn {
-      float: right;
+    .top {
+      text-align: center;
+      margin-bottom: 70px;
+      position: relative;
+
+      .search {
+        display: inline-block;
+        width: 500px;
+      }
+
+      .right {
+        position: absolute;
+        right: 0;
+        top: 0;
+
+        .ant-btn-link {
+          color: #7a7a7a;
+          transition: all 0.3s;
+        }
+
+        .ant-btn-link:hover {
+          color: #1890FF;
+        }
+
+        .action {
+          padding-top: 3px;
+          display: inline-block;
+          line-height: 34px;
+          height: 34px;
+          border-left: 1px solid #cacaca;
+          padding-left: 10px;
+
+          i {
+            cursor: pointer;
+            padding: 10px 16px;
+            color: #7a7a7a;
+            transition: all 0.3s;
+          }
+
+          i:hover {
+            color: #1890FF;
+          }
+        }
+      }
+    }
+
+    .filter {
+      position: absolute;
+      top: 110px;
+      left: 0;
+      color: #7a7a7a;
+
+      i {
+        margin-right: 10px;
+      }
+    }
+
+    .list {
+      margin: 0 -10px;
+
+      .item {
+        width: 310px;
+        display: inline-block;
+        margin: 0 10px 20px;
+      }
     }
   }
 }
-
-// .cardWrapper {
-//   border: 1px solid red;
-// }

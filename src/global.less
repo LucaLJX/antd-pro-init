@@ -6,6 +6,15 @@ body,
   height: 100%;
 }
 
+#root {
+  overflow: auto;
+}
+
+#root>section,
+#root>section>main {
+  min-height: 100%;
+}
+
 .colorWeak {
   filter: invert(80%);
 }
@@ -33,15 +42,33 @@ ol {
   .ant-table {
     width: 100%;
     overflow-x: auto;
-    &-thead > tr,
-    &-tbody > tr {
-      > th,
-      > td {
+
+    &-thead>tr,
+    &-tbody>tr {
+
+      >th,
+      >td {
         white-space: pre;
-        > span {
+
+        >span {
           display: block;
         }
       }
     }
+  }
+}
+
+:global {
+  .full-screen {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10;
+  }
+
+  .ant-select-dropdown-menu-item.divider {
+    border-bottom: 1px solid #eee;
   }
 }

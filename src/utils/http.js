@@ -1,34 +1,34 @@
-import axios from 'axios'
-import { Component } from 'react'
-import Qs from 'qs'
-import { message } from 'antd'
+import axios from 'axios';
+import { Component } from 'react';
+import Qs from 'qs';
+import { message } from 'antd';
 
-let base = '/api'
+let base = '/api';
 
 // 请求前拦截
 axios.interceptors.request.use(
   config => {
     // 请求超时时间
-    config.timeout = 5000
-    return config
+    config.timeout = 5000;
+    return config;
   },
   err => {
-    console.log('请求超时')
-    return Promise.reject(err)
-  }
-)
+    console.log('请求超时');
+    return Promise.reject(err);
+  },
+);
 
 // 返回后拦截
 axios.interceptors.response.use(
   response => {
     // 响应拦截
     if (response.data.code !== 0) {
-      message.error(response.data.msg)
+      message.error(response.data.msg);
     }
     if (response.data.code === 18) {
-      window.location.replace('/login')
+      window.location.replace('/login');
     }
-    return response
+    return response;
   },
   err => {
     // if (err.response.status === 504 || err.response.status === 404) {
@@ -38,9 +38,10 @@ axios.interceptors.response.use(
     // } else if (err.response.status === 500) {
     //   console.log('服务器开小差了⊙﹏⊙∥')
     // }
-    return Promise.reject(err)
-  }
-)
+    message.error(err.message);
+    return Promise.reject(err);
+  },
+);
 
 // @RequestBody请求
 const postRequestBody = (url, params) => {
@@ -51,10 +52,10 @@ const postRequestBody = (url, params) => {
     headers: {
       'Content-Type': 'application/json',
       charset: 'utf-8',
-      'token': window.localStorage.getItem('token')
-    }
-  })
-}
+      token: window.localStorage.getItem('token'),
+    },
+  });
+};
 
 // @RequsetParam请求
 const postRequestParam = (url, params, type = 'data') => {
@@ -63,13 +64,13 @@ const postRequestParam = (url, params, type = 'data') => {
     url: `${base}${url}`,
     data: type === 'data' ? params : null,
     params: type === 'params' ? params : null,
-    paramsSerializer: (params) => {
-      return Qs.stringify(params, { arrayFormat: 'brackets' })
+    paramsSerializer: params => {
+      return Qs.stringify(params, { arrayFormat: 'brackets' });
     },
     transformRequest: [
       data => {
-        return Qs.stringify(data)
-      }
+        return Qs.stringify(data);
+      },
       // function(data) {
       //   let ret = ''
       //   for (let it in data) {
@@ -81,28 +82,28 @@ const postRequestParam = (url, params, type = 'data') => {
     ],
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
-      'token': window.localStorage.getItem('token')
-    }
-  })
-}
+      token: window.localStorage.getItem('token'),
+    },
+  });
+};
 
 const get = (url, params) => {
   return axios({
     method: 'get',
     headers: {
-      'token': window.localStorage.getItem('token')
+      token: window.localStorage.getItem('token'),
     },
     url: `${base}${url}`,
-    params: params
-  })
-}
+    params: params,
+  });
+};
 
 const multiple = function(requsetArray, callback) {
-  axios.all(requsetArray).then(axios.spread(callback))
-}
+  axios.all(requsetArray).then(axios.spread(callback));
+};
 
 export const http = {
   get: get,
   postRequestParam: postRequestParam,
-  postRequestBody: postRequestBody
-}
+  postRequestBody: postRequestBody,
+};

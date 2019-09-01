@@ -1,73 +1,94 @@
 import {
   getSenceData,
-  getOldHeader,
-  initHeader,
-  getOldData,
-  getNewRole,
-  createSence
+  getCharacterSimple,
+  getLocationSimple,
+  getPlaceSimple,
+  modifySenceSimple,
+  modifySenceCharacterState,
 } from '@/services/SenceManage';
-import _ from 'lodash'
+import _ from 'lodash';
 
 const Model = {
   namespace: 'senceManage',
-  state: {
-    senceList: [],
-    senceHeader: [],
-    totalCount: 0,
-    getHeader: false,
-    header: []
-  },
+  state: {},
   effects: {
-    *clearHeader ({ payload, callback }, { call, put }) {
-      yield put({
-        type: 'save',
-        payload: {
-          header: [],
-          getHeader: false
-        }
-      })
-    },
-    *setHeader ({ payload, callback }, { call, put }) {
-      yield put({
-        type: 'save',
-        payload: {
-          header: payload.header,
-          getHeader: true
-        }
-      })
-    },
-    *getSenceData ({ payload, callback }, { call, put }) {
-      yield put({
-        type: 'save',
-        payload: {
-          senceHeader: [],
-          senceList: [],
-          totalCount: 0
-        }
-      })
-      const { data } = yield call(getSenceData, payload.params)
-      const res = data.data
-      let list = []
-      if (res.recordList && res.recordList.length !== 0) {
-        list = res.recordList.map((item, i) => {
-          return Object.assign(item, {
-            key: `senceList${i}`
-          })
-        })
+    *getSenceData({ payload, success, fail }, { call, put }) {
+      try {
+        const { data } = yield call(getSenceData, payload.params);
+        const res = data.data;
+        if (success) success(res);
+      } catch (err) {
+        if (fail) fail(err);
       }
-      yield put({
-        type: 'save',
-        payload: {
-          senceHeader: res.recordHead,
-          senceList: list,
-          totalCount: res.recordCount,
+    },
+    *modifySenceSimple({ payload, success, fail }, { call, put }) {
+      try {
+        const key = payload.key;
+        let handler = null;
+        const params = {};
+        params.projectId = payload.id;
+        params.sceneId = payload.sceneId;
+        switch (key) {
+          case 'character':
+            handler = modifySenceCharacterState;
+            params.characterId = payload.characterId;
+            params.state = payload.value;
+            break;
+          default:
+            handler = modifySenceSimple;
+            params[payload.key] = payload.value;
+            break;
         }
-      })
-      if (callback) {
-        callback({
-          header: res.recordHead,
-          getHeader: false
-        })
+        if (!handler && success) return success();
+        const { data } = yield call(handler, params);
+        if (success) success(data.code == 0 ? null : data.msg, data.data);
+      } catch (err) {
+        if (fail) fail(err);
+      }
+    },
+    *getSelectData({ payload, success, fail }, { call, put }) {
+      try {
+        const key = payload.key;
+        let handler = null;
+        const params = { projectId: payload.id };
+        switch (key) {
+          case 'location':
+            handler = getLocationSimple;
+            params.columnId = payload.value;
+            break;
+          case 'character':
+            handler = getCharacterSimple;
+            params.characterType = payload.value;
+            break;
+          case 'place':
+            handler = getPlaceSimple;
+            break;
+        }
+        if (!handler && success) return success([]);
+        const { data } = yield call(handler, params);
+        const res = data.data;
+        if (params.all && success) success(res);
+        const list = [];
+        switch (key) {
+          case 'location':
+            res.forEach(item => {
+              list.push({ label: item.locationName, value: item.id });
+            });
+            break;
+          case 'character':
+            res.forEach(item => {
+              list.push({ label: item.characterFullName, value: item.characterId });
+            });
+            break;
+          case 'place':
+            res.forEach(item => {
+              list.push({ label: item, value: item });
+            });
+            break;
+        }
+        if (success) success(list);
+      } catch (err) {
+        if (fail) fail(err);
       }
     },
   },

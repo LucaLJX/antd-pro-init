@@ -4,44 +4,95 @@
   position: relative;
   border-radius: 0.1rem;
   margin: 10px 0;
+
   &:hover {
     transform: translateY(-5px);
     transition: all .3s;
+
+    :global {
+      .pushpin {
+        opacity: 1;
+      }
+    }
   }
+
   :global {
+    .pushpin {
+      position: absolute;
+      top: 200px;
+      right: 10px;
+      padding: 10px;
+      cursor: pointer;
+      opacity: 0;
+      transition: all 0.3s;
+    }
+
+    .pushpin:hover {
+      color: lighten(#fe970f, 10);
+    }
+
+    .pushpin.active {
+      opacity: 1;
+      color: #fe970f;
+    }
+
     .ant-card-cover {
       height: 200px;
+      line-height: 200px;
+      position: relative;
+      text-align: center;
+      font-size: 40px;
+      background: #eee;
+
+      .image {
+        position: absolute;
+        width: 100%;
+        top: 0;
+        left: 0;
+        height: 100%;
+      }
+
       img {
         height: 100%;
       }
     }
+
     .ant-card-body {
       padding: 20px;
     }
+
     .ant-card-meta-description {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
       width: 100%;
+      text-align: left;
     }
+
     .ant-card-meta-title {
       font-size: 14px;
       font-weight: 600;
+      text-align: left;
     }
+
     .ant-card-meta-detail>div:not(:last-child) {
       margin-bottom: 0;
     }
   }
+
   .bottominfo {
-    margin-top: 10px;
+    margin-top: 15px;
     overflow: hidden;
+
     >span {
       float: left;
       font-size: 12px;
       line-height: 20px;
     }
+
     >div {
       float: right;
+
       :global {
         .ant-avatar {
           width: 20px;
