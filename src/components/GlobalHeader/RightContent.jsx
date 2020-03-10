@@ -39,8 +39,8 @@ const GlobalHeaderRight = props => {
         onPressEnter={value => {
           console.log('enter', value);
         }}
-      /> */}
-      {/* <Tooltip
+      />
+      <Tooltip
         title={formatMessage({
           id: 'component.globalHeader.help',
         })}
@@ -60,7 +60,4 @@ const GlobalHeaderRight = props => {
   );
 };
 
-export default connect(({ settings }) => ({
-  theme: settings.navTheme,
-  layout: settings.layout,
-}))(GlobalHeaderRight);
+export default GlobalHeaderRight;

@@ -6,15 +6,6 @@ body,
   height: 100%;
 }
 
-#root {
-  overflow: auto;
-}
-
-#root>section,
-#root>section>main {
-  min-height: 100%;
-}
-
 .colorWeak {
   filter: invert(80%);
 }
@@ -59,12 +50,20 @@ ol {
 }
 
 :global {
+  .ant-pro-sider-menu {
+    .ant-drawer-content-wrapper {
+      width: 200px !important;
+    }
+  }
+
   .full-screen {
     position: fixed !important;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
+    width: 100% !important;
+    height: 100% !important;
     z-index: 10;
   }
 

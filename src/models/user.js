@@ -1,10 +1,26 @@
 import { queryCurrent, query as queryUsers } from '@/services/user';
+import { logout, getInfo } from '@/services/BasicLayout';
+
 const UserModel = {
   namespace: 'user',
   state: {
     currentUser: {},
   },
   effects: {
+    *getInfo({ payload, callback }, { call, put }) {
+      const data = yield call(getInfo, payload);
+      const res = data.data.data;
+      yield put({
+        type: 'saveCurrentUser',
+        payload: res,
+      });
+    },
+    *logout({ payload, callback }, { call, put }) {
+      const data = yield call(logout, payload);
+      if (callback && data.data.code === 0) {
+        callback({ code: 0 });
+      }
+    },
     *fetch(_, { call, put }) {
       const response = yield call(queryUsers);
       yield put({

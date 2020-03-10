@@ -1,0 +1,162 @@
+.create {
+  margin-top: 24px;
+  padding: 24px;
+  background: #fff;
+
+  :global {
+    .ant-form-item-control-wrapper {
+      text-align: left;
+    }
+
+    .steps {
+      margin: 10px auto 50px;
+      max-width: 700px;
+    }
+
+    .body.show {
+      display: block;
+    }
+
+    .body {
+      display: none;
+      margin-bottom: 20px;
+      text-align: center;
+
+      .layout {
+        max-width: 900px;
+        margin: 0 auto;
+
+        .form {
+          vertical-align: top;
+          display: inline-block;
+          width: 100%;
+          max-width: 600px;
+        }
+      }
+
+      .upload {
+        display: inline-block;
+        max-width: 300px;
+        width: 100%;
+
+        img {
+          width: 100%;
+        }
+
+        .ant-upload {
+          height: 200px;
+
+          .empty {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            color: #999;
+          }
+
+          .error {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            color: red;
+          }
+        }
+      }
+
+      .form {
+        margin-bottom: 40px;
+
+        .step2-1 {
+          border-bottom: 1px dashed #ddd;
+        }
+
+        .step2-2 {
+          padding-top: 20px;
+
+          .minus-product {
+            color: red;
+            font-size: 30px;
+            position: absolute;
+            right: -50px;
+            top: -5px;
+          }
+
+          .ant-calendar-picker {
+            width: 100%;
+          }
+        }
+
+        .step2-3 {
+          i {
+            transform: translateY(5px);
+            margin: 0 20px;
+            color: #1890FF;
+            font-size: 30px;
+            cursor: pointer;
+          }
+        }
+      }
+
+      .info {
+        .icon {
+          text-align: center;
+          padding-top: 10px;
+          margin-bottom: 25px;
+
+          i {
+            font-size: 70px;
+            margin-bottom: 25px;
+            color: #58C427;
+          }
+
+          .text {
+            font-size: 24px;
+            color: #101010;
+          }
+        }
+
+        .detail {
+          max-width: 670px;
+          padding: 15px;
+          margin: 0 auto;
+          background: #FAFAFA;
+          margin-bottom: 25px;
+
+          .desc {
+            text-align: left;
+            display: inline-block;
+            vertical-align: top;
+            padding-left: 30px;
+            padding-top: 15px;
+            width: 100%;
+            max-width: 340px;
+
+            .t {
+              margin-bottom: 20px;
+
+              span {
+                font-size: 18px;
+              }
+            }
+
+            .text {
+              margin-bottom: 10px;
+
+              span {
+                margin: 0 5px;
+                font-size: 12px;
+              }
+            }
+          }
+        }
+      }
+
+      .btns {
+        text-align: center;
+
+        button {
+          margin: 0 20px;
+        }
+      }
+    }
+  }
+}

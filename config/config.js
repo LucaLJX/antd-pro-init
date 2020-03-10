@@ -17,7 +17,7 @@ const plugins = [
       },
       locale: {
         // default false
-        enable: false,
+        enable: true,
         // default zh-CN
         default: 'zh-CN',
         // default true, when it is true, will use `navigator.language` overwrite default
@@ -83,7 +83,7 @@ export default {
   routes: [
     {
       path: '/',
-      redirect: '/list'
+      redirect: '/list',
     },
     {
       path: '/login',
@@ -91,18 +91,41 @@ export default {
     },
     {
       path: '/list',
-      component: '../layouts/UserLayout',
+      component: '../layouts/BasicLayout',
       Routes: ['src/pages/Authorized'],
       authority: ['admin', 'user'],
+      hideBread: true,
+      hideRoute: true,
+      settings: {
+        layout: 'topmenu',
+      },
       routes: [
         {
           path: '/list',
-          name: 'welcome',
-          icon: '',
-          component: './ProjectList/index',
+          component: './All/List/index',
+        },
+      ],
+    },
+    {
+      path: '/all',
+      component: '../layouts/BasicLayout',
+      Routes: ['src/pages/Authorized'],
+      authority: ['admin', 'user'],
+      settings: {
+        layout: 'topmenu',
+      },
+      routeLocal: true,
+      hideRoute: true,
+      routes: [
+        {
+          path: '/all',
+          name: '项目',
+          redirect: '/',
         },
         {
-          component: './404',
+          name: '创建项目',
+          path: '/all/create',
+          component: './All/Create/index',
         },
       ],
     },
@@ -115,12 +138,27 @@ export default {
       routes: [
         {
           path: '/project/:id',
-          redirect: '/project/:id/dashboard'
+          redirect: '/project/:id/dashboard',
         },
         {
           path: '/project/:id/dashboard',
           name: '',
           component: './Base',
+        },
+      ],
+    },
+    {
+      path: '/overall/:id/characters',
+      component: '../layouts/BasicLayout',
+      Routes: ['src/pages/Authorized'],
+      authority: ['admin', 'user'],
+      hideBread: true,
+      routes: [
+        {
+          path: '/overall/:id/characters',
+          name: '角色',
+          icon: 'smile',
+          component: './Overall/CharacterManage',
         },
       ],
     },
@@ -133,13 +171,7 @@ export default {
       routes: [
         {
           path: '/overall/:id',
-          redirect: '/overall/:id/sence'
-        },
-        {
-          path: '/overall/:id/script',
-          name: '剧本',
-          icon: 'smile',
-          component: './Overall/Script',
+          redirect: '/overall/:id/sence',
         },
         {
           path: '/overall/:id/sence',
@@ -148,25 +180,10 @@ export default {
           component: './Overall/SenceManage',
         },
         {
-          path: '/overall/:id/plan',
-          name: '大计划',
-          icon: 'smile',
-          component: './Overall/Plan',
-        },
-        {
           path: '/overall/:id/location',
           name: '场景',
           icon: 'smile',
           component: './Overall/Location',
-        },
-        {
-          path: '/overall/:id/characters',
-          name: '角色',
-          icon: 'smile',
-          component: './Overall/Characters',
-        },
-        {
-          component: './404',
         },
       ],
     },
@@ -177,10 +194,10 @@ export default {
   // Theme for antd: https://ant.design/docs/react/customize-theme-cn
   theme: {
     'primary-color': primaryColor,
+    'pro-header-hover-bg': '#00000006',
   },
   define: {
-    ANT_DESIGN_PRO_ONLY_DO_NOT_USE_IN_YOUR_PRODUCTION:
-      ANT_DESIGN_PRO_ONLY_DO_NOT_USE_IN_YOUR_PRODUCTION || '', // preview.pro.ant.design only do not use in your production ; preview.pro.ant.design 专用环境变量，请不要在你的项目中使用它。
+    ANT_DESIGN_PRO_ONLY_DO_NOT_USE_IN_YOUR_PRODUCTION: ANT_DESIGN_PRO_ONLY_DO_NOT_USE_IN_YOUR_PRODUCTION || '', // preview.pro.ant.design only do not use in your production ; preview.pro.ant.design 专用环境变量，请不要在你的项目中使用它。
   },
   ignoreMomentLocale: true,
   lessLoaderOptions: {

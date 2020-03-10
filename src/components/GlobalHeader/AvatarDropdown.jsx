@@ -26,55 +26,44 @@ class AvatarDropdown extends React.Component {
   };
 
   render() {
-    const { currentUser = {}, menu } = this.props;
-    console.log('lalal')
-    console.log(currentUser)
-
-    if (!menu) {
-      return (
-        <span className={`${styles.action} ${styles.account}`}>
-          <Avatar size="small" className={styles.avatar} src={currentUser.avatar} alt="avatar" />
-          <span className={styles.name}>{currentUser.userName}</span>
-        </span>
-      );
-    }
+    const { currentUser = { avatar: '', name: '' }, menu } = this.props;
 
     const menuHeaderDropdown = (
       <Menu className={styles.menu} selectedKeys={[]} onClick={this.onMenuClick}>
-        <Menu.Item key="center">
-          <Icon type="user" />
-          <FormattedMessage id="menu.account.center" defaultMessage="account center" />
-        </Menu.Item>
-        <Menu.Item key="settings">
-          <Icon type="setting" />
-          <FormattedMessage id="menu.account.settings" defaultMessage="account settings" />
-        </Menu.Item>
-        <Menu.Divider />
+        {menu && (
+          <Menu.Item key="center">
+            <Icon type="user" />
+            <FormattedMessage id="menu.account.center" defaultMessage="account center" />
+          </Menu.Item>
+        )}
+        {menu && (
+          <Menu.Item key="settings">
+            <Icon type="setting" />
+            <FormattedMessage id="menu.account.settings" defaultMessage="account settings" />
+          </Menu.Item>
+        )}
+        {menu && <Menu.Divider />}
+
         <Menu.Item key="logout">
           <Icon type="logout" />
-          <FormattedMessage id="menu.account.logout" defaultMessage="logout" />
+          登出
         </Menu.Item>
       </Menu>
     );
-    return currentUser && currentUser.userName ? (
+
+    return currentUser && currentUser.nickName ? (
       <HeaderDropdown overlay={menuHeaderDropdown}>
         <span className={`${styles.action} ${styles.account}`}>
-          <Avatar size="small" className={styles.avatar} src={currentUser.avatar} alt="avatar" />
-          <span className={styles.name}>{currentUser.name}</span>
+          <Avatar size="small" className={styles.avatar} src={currentUser.avatarUrl} alt="avatar" />
+          <span className={styles.name}>{currentUser.nickName}</span>
         </span>
       </HeaderDropdown>
     ) : (
-      <Spin
-        size="small"
-        style={{
-          marginLeft: 8,
-          marginRight: 8,
-        }}
-      />
+      <Spin size="small" style={{ marginLeft: 8, marginRight: 8 }} />
     );
   }
 }
 
-export default connect(({ userInfo }) => ({
-  currentUser: userInfo.currentUser,
+export default connect(({ user }) => ({
+  currentUser: user.currentUser,
 }))(AvatarDropdown);

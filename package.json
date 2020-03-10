@@ -22,7 +22,8 @@
     "start:no-mock": "cross-env MOCK=none umi dev",
     "test": "umi test",
     "test:all": "node ./tests/run-tests.js",
-    "test:component": "umi test ./src/components"
+    "test:component": "umi test ./src/components",
+    "update": "npm run build && tar -zcvf dist.tar.gz dist/* && scp dist.tar.gz root@47.96.151.103:/home/pro/test/web-upload/ && ssh root@47.96.151.103 \"cd /home/pro/test/web-upload/; tar -zxvf dist.tar.gz; rm dist.tar.gz; exit;\""
   },
   "lint-staged": {
     "**/*.less": "stylelint --syntax less",

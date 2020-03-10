@@ -1,40 +1,42 @@
-.wrapper {
-  height: calc(100vh - 180px);
+.Wrapper {
+  // height: calc(100vh - 180px);
+  height: calc(100vh - 140px);
+  width: calc(100% + 48px)!important;
   position: relative;
-}
+  margin-left: -24px!important;
+  // margin-top: -24px!important;
+  margin-top: -68px!important;
 
-.ContentWrapper {
-  display: flex;
-  flex-direction: row;
-}
-
-.Left {
-  width: 200px;
-  height: calc(100vh - 200px);
   :global {
-    .ant-card {
-      margin-right: 10px;
-      height: 100%;
+    .ant-tabs {
+      height: 100%!important;
+    }
+
+    .ant-tabs-bar {
+      background-color: #fff;
+      margin: 0;
+    }
+
+    .ant-tabs-nav-wrap {
+      padding-left: 10px;
+    }
+
+    .ant-tabs-content {
+      height: calc(100% - 14px)!important;
+      // height: calc(100% - 60px)!important;
     }
   }
 }
 
-.Middle {
-  height: calc(100vh - 200px);
-  flex:1;
-  :global {
-    .ant-card {
-      margin-bottom: 10px;
-    }
-  }
+.LocationTabPane {
+  padding: 24px 24px 0 24px;
 }
 
-.Right {
-  width: 300px;
-  height: calc(100vh - 200px);
+.CardWrapper {
+  height: calc(100% - 0px);
+
   :global {
-    .ant-card {
-      margin-left: 10px;
+    .ant-card-body {
       height: 100%;
     }
   }

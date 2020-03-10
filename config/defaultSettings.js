@@ -10,8 +10,7 @@ export default {
   menu: {
     locale: false,
   },
-  title: '易制片',
+  title: 'EasyAction',
   pwa: false,
-  iconfontUrl: '',
-  collapse: false
+  collapse: true,
 };

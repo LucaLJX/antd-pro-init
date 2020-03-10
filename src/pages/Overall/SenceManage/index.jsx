@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'dva';
 import styles from './index.less';
-import { Layout, Row, Col, Button, Modal, Form, Select, Input, Table, Pagination, Tag, Card } from 'antd';
+import { Layout, Row, Col, Button, Modal, Form, Select, Input, Table, Pagination, Tag, Card, message } from 'antd';
 import ProjectCard from '@/components/ProjectCard';
 import EaTable from '@/components/EaTable';
 
@@ -15,7 +15,6 @@ const columnMap = {
     editType: 'input',
   },
   sceneNum: {
-    sorter: true,
     filter: true,
     filterType: 'input',
     editType: 'input',
@@ -144,7 +143,7 @@ const KEY = 'sceneId';
 
 @connect(({ senceManage }) => ({ senceManage }))
 @Form.create()
-export default class ProjectList extends React.Component {
+export default class SenceManage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -154,7 +153,6 @@ export default class ProjectList extends React.Component {
         projectId: null,
         pageIndex: 0,
         pageNum: 20,
-        addActor: false,
       },
       result: { senceList: [], senceHeader: [], totalCount: 0, wupageSumCount: 0, wenpageSumCount: 0 },
     };
@@ -169,11 +167,11 @@ export default class ProjectList extends React.Component {
       },
     } = this.props;
     this.state.searchParams.projectId = id;
-    this.getSenceData();
+    this.getData();
   }
 
   // 获取表格数据
-  getSenceData(params = {}) {
+  getData(params = {}) {
     this.setState({ loading: true });
     const { dispatch } = this.props;
     params = Object.assign({}, this.state.searchParams, params);
@@ -230,7 +228,7 @@ export default class ProjectList extends React.Component {
         params[key] = filters[key][0];
       }
     }
-    this.getSenceData(params);
+    this.getData(params);
   }
 
   getSelectData(type, column, cb) {
@@ -270,7 +268,6 @@ export default class ProjectList extends React.Component {
         type: 'senceManage/getSelectData',
         payload: params,
         success: res => {
-          console.log(res);
           if (!columnMap[column.key]) columnMap[column.key] = {};
           columnMap[column.key][type] = res;
           cb(columnMap[column.key][type]);
@@ -310,12 +307,42 @@ export default class ProjectList extends React.Component {
     dispatch({
       type: 'senceManage/modifySenceSimple',
       payload: params,
-      success: (err, data) => {
-        if (!err) this.refreshData(data);
+      success: data => {
+        this.refreshData(data);
+        cb();
+      },
+      fail: err => {
         cb(err);
       },
-      fail: err => {},
     });
+  }
+
+  onContextMenu(record, column) {
+    return [
+      { title: '测试一' + column.title, key: '1' },
+      { title: '测试禁用', key: '2', disabled: true },
+      {
+        title: '测试子菜单',
+        key: '3',
+        children: [{ title: '测试二', key: '3-1' }, { title: '测试禁用', key: '3-2', disabled: true }],
+      },
+    ];
+  }
+
+  onHeadContextMenu(column) {
+    return [
+      { title: '列测试一' + column.title, key: '1' },
+      { title: '列测试禁用', key: '2', disabled: true },
+      {
+        title: '列测试子菜单',
+        key: '3',
+        children: [{ title: '列测试二', key: '3-1' }, { title: '列测试禁用', key: '3-2', disabled: true }],
+      },
+    ];
+  }
+
+  onMenuClick(data) {
+    message.info(data.item.props.children);
   }
 
   refreshData(data) {
@@ -390,36 +417,31 @@ export default class ProjectList extends React.Component {
     } = this.state;
     const currentPage = pageIndex + 1;
     return (
-      <div className={styles.wrapper} style={{ width: '100%', margin: 'auto', paddingTop: '20px' }}>
-        <div className={styles.SearchWrapper}>
-          {/* <Button type='primary' onClick={() => this.createHeader()}>添加角色</Button>
-          <br/>
-          <Button type='primary' onClick={() => this.createTableData()}>添加表格数据</Button> */}
-        </div>
-
-        <Card id="full-screen" className={styles.CardWrapper}>
-          <EaTable
-            rowKey={KEY}
-            totalInfo={
-              <div style={{ display: 'inline-block' }}>
-                <span style={{ color: '#1890FF' }}>{totalCount}</span>个场次；文戏：{' '}
-                <span style={{ color: '#1890FF' }}>{wenpageSumCount}</span> 页；武戏：
-                <span style={{ color: '#1890FF' }}>{wupageSumCount}</span> 页
-              </div>
-            }
-            fullId="full-screen"
-            loading={loading}
-            columns={senceHeader}
-            dataSource={senceList}
-            current={currentPage}
-            pageSize={pageNum}
-            total={totalCount}
-            getSelectData={(type, column, cb) => this.getSelectData(type, column, cb)}
-            onChangeValue={(record, column, value, cb) => this.onChangeValue(record, column, value, cb)}
-            onChange={(pagination, filters, sorter) => this.changePage(pagination, filters, sorter)}
-          />
-        </Card>
-      </div>
+      <Card id="full-screen" className={styles.CardWrapper}>
+        <EaTable
+          rowKey={KEY}
+          totalInfo={
+            <div style={{ display: 'inline-block' }}>
+              <span style={{ color: '#1890FF' }}>{totalCount}</span>个场次；文戏：{' '}
+              <span style={{ color: '#1890FF' }}>{wenpageSumCount}</span> 页；武戏：
+              <span style={{ color: '#1890FF' }}>{wupageSumCount}</span> 页
+            </div>
+          }
+          fullId="full-screen"
+          loading={loading}
+          columns={senceHeader}
+          dataSource={senceList}
+          current={currentPage}
+          pageSize={pageNum}
+          total={totalCount}
+          onMenuClick={key => this.onMenuClick(key)}
+          onContextMenu={(record, column) => this.onContextMenu(record, column)}
+          onHeadContextMenu={column => this.onHeadContextMenu(column)}
+          getSelectData={(type, column, cb) => this.getSelectData(type, column, cb)}
+          onChangeValue={(record, column, value, cb) => this.onChangeValue(record, column, value, cb)}
+          onChange={(pagination, filters, sorter) => this.changePage(pagination, filters, sorter)}
+        />
+      </Card>
     );
   }
 }

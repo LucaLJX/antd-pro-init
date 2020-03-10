@@ -22,6 +22,14 @@
       .action-list {
         padding-top: 3px;
         display: inline-block;
+        margin: 0 -20px;
+
+        .action {
+          display: inline-block;
+          border-left: 1px solid #eee;
+          padding: 0 20px;
+          line-height: 32px;
+        }
 
         .anticon {
           font-size: 16px;
@@ -75,6 +83,12 @@
       table {
         transform-origin: left top;
         border-bottom: 1px solid #eee !important;
+
+        td,
+        th {
+          user-select: none;
+          transition: none;
+        }
       }
 
       .ant-table-small {
@@ -183,10 +197,36 @@
         background: rgb(229, 246, 254);
       }
 
+      .ant-table-small>.ant-table-content>.ant-table-body>table>.ant-table-tbody>tr>td {
+        padding: 5px 12px 5px 12px;
+        border-bottom: 1px solid #e8e8e8;
+      }
+
+      .ant-table-small>.ant-table-content>.ant-table-body>table>.ant-table-tbody>tr.selected {
+        .start {
+          padding-left: 10px;
+          border-left: 2px solid #1890ff;
+        }
+
+        .end {
+          padding-right: 10px;
+          border-right: 2px solid #1890ff;
+        }
+      }
+
+      .ant-table-small>.ant-table-content>.ant-table-body>table>.ant-table-tbody>tr.selected.top>td {
+        padding-top: 3px;
+        border-top: 2px solid #1890ff;
+      }
+
+      .ant-table-small>.ant-table-content>.ant-table-body>table>.ant-table-tbody>tr.selected.bottom>td {
+        padding-bottom: 4px;
+        border-bottom: 2px solid #1890ff;
+      }
+
       .ea-table-body-cell {
         white-space: nowrap;
         position: relative;
-        padding: 5px 12px !important;
 
         .edit {
           position: absolute;

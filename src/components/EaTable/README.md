@@ -1,19 +1,25 @@
 ### table 属性
 
-|     属性      |              说明              |                 类型                  | 默认值 |
-| :-----------: | :----------------------------: | :-----------------------------------: | :----: |
-|    rowKey     |       表格行 key 的取值        |                string                 |  key   |
-|    fullId     |      全屏指定的 elementId      |                string                 |   -    |
-|   totalInfo   |          统计条的内容          |           string,ReactNode            |   -    |
-|    loading    |         页面是否加载中         |                boolean                | false  |
-|    columns    |        表格列的配置描述        |                 any[]                 |   []   |
-|  dataSource   |            数据数组            |                 any[]                 |   []   |
-|    current    |             当前页             |                number                 |   0    |
-|   pageSize    |          页面数据长度          |                number                 |   20   |
-|     count     |           数据总长度           |                number                 |   0    |
-| getSelectData | 异步获取过滤或编辑所需额外数据 |       Function(type, field, cb)       |   -    |
-| onChangeValue |          异步编辑接口          |    Function(key, field, value, cb)    |   -    |
-|   onChange    |   分页、排序、筛选变化时触发   | Function(pagination, filters, sorter) |   -    |
+|       属性        |                       说明                       |                 类型                  | 默认值 |
+| :---------------: | :----------------------------------------------: | :-----------------------------------: | :----: |
+|      rowKey       |                表格行 key 的取值                 |                string                 |  key   |
+|      fullId       |               全屏指定的 elementId               |                string                 |   -    |
+|     totalInfo     |                   统计条的内容                   |           string,ReactNode            |   -    |
+|      loading      |                  页面是否加载中                  |                boolean                | false  |
+|      columns      |                 表格列的配置描述                 |                 any[]                 |   []   |
+|    dataSource     |                     数据数组                     |                 any[]                 |   []   |
+|      current      |                      当前页                      |                number                 |   0    |
+|     pageSize      |                   页面数据长度                   |                number                 |   20   |
+|       count       |                    数据总长度                    |                number                 |   0    |
+|   getSelectData   |          异步获取过滤或编辑所需额外数据          |       Function(type, field, cb)       |   -    |
+|   onChangeValue   |                   异步编辑接口                   |    Function(key, field, value, cb)    |   -    |
+|     onChange      |            分页、排序、筛选变化时触发            | Function(pagination, filters, sorter) |   -    |
+| onSelectedChange  |                选择发生变化时触发                |         Function(selectedKey)         |   -    |
+|   onContextMenu   |                表格单元格右键事件                |    Function(record, column) => []     |   -    |
+| onHeadContextMenu |                 表格列头右键事件                 |        Function(column) => []         |   -    |
+|    onMenuClick    |                 右键菜单点击事件                 |          Function(menuData)           |   -    |
+|    pagination     |                   是否显示分页                   |                boolean                |  true  |
+|       edit        | 是否开启编辑功能（若开启，需要对配置项进行配置） |                Boolean                |  true  |
 
 ### columns 新增属性
 

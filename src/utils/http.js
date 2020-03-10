@@ -22,6 +22,8 @@ axios.interceptors.request.use(
 axios.interceptors.response.use(
   response => {
     // 响应拦截
+    // 不是系统接口直接返回response
+    if (response.data.code === undefined) return response;
     if (response.data.code !== 0) {
       message.error(response.data.msg);
     }
@@ -98,12 +100,25 @@ const get = (url, params) => {
   });
 };
 
+const upload = (url, data) => {
+  var formData = new FormData();
+  for (let key in data) {
+    formData.append(key, data[key]);
+  }
+  return axios.post(url, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+};
+
 const multiple = function(requsetArray, callback) {
   axios.all(requsetArray).then(axios.spread(callback));
 };
 
 export const http = {
-  get: get,
+  get,
+  upload,
   postRequestParam: postRequestParam,
   postRequestBody: postRequestBody,
 };

@@ -4,16 +4,14 @@
  * https://github.com/ant-design/ant-design-pro-layout
  */
 import ProLayout, { PageHeaderWrapper } from '@ant-design/pro-layout';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Link from 'umi/link';
 import { connect } from 'dva';
 import Authorized from '@/utils/Authorized';
 import RightContent from '@/components/GlobalHeader/RightContent';
 import { isAntDesignPro } from '@/utils/utils';
-import logo from '../assets/logo.svg';
 import router from 'umi/router';
-import styles from './BasicLayout.less';
-import { Menu, Dropdown, Icon, message, Avatar } from 'antd';
+import './BasicLayout.less';
 
 /**
  * use Authorized check all menu item
@@ -29,7 +27,7 @@ const menuDataRender = menuList =>
  * @param {*} _
  * @param {*} defaultDom 默认的返回dom
  */
-const footerRender = (_, defaultDom) => {
+const footerRender = () => {
   if (!isAntDesignPro()) {
     return null;
   }
@@ -59,71 +57,27 @@ const BasicLayout = props => {
     match: {
       params: { id },
     },
-    basicLayout: { menuData, nickName, avatarUrl },
+    route,
+    basicLayout,
   } = props;
-  /**
-   * constructor
-   */
-
-  /**
-   * 登出
-   */
-  const logout = () => {
-    if (dispatch) {
-      dispatch({
-        type: 'basicLayout/logout',
-        payload: {},
-        callback: res => {
-          if (res.code === 0) {
-            // 登出成功
-            message.success('登出成功！');
-            window.localStorage.removeItem('token');
-            window.localStorage.removeItem('userName');
-            router.push('/login');
-          }
-        },
-      });
-    }
-  };
-
-  const menu = (
-    <Menu>
-      <Menu.Item onClick={() => logout()}>登出</Menu.Item>
-    </Menu>
-  );
-
-  /**
-   * 页头的渲染方法，返回null
-   * @param {*} _
-   * @param {*} defaultDom 默认的返回dom
-   */
-  const headerRender = (_, defaultDom) => {
-    return (
-      <div className={styles.commonHeader}>
-        <Dropdown className={styles.DropdownWrapper} overlay={menu}>
-          <a href="#">
-            <Avatar className={styles.avatar} src={avatarUrl} />
-            <span className={styles.nickName}>{nickName}</span>
-            <Icon type="down" />
-          </a>
-        </Dropdown>
-      </div>
-    );
-  };
-
+  const { menuData } = basicLayout;
   /**
    * 获取动态菜单
    */
+  const _setting = route.settings ? Object.assign({}, settings, route.settings) : settings;
+
   useState(() => {
     if (dispatch) {
+      if (id) {
+        dispatch({
+          type: 'basicLayout/getMenu',
+          payload: {
+            projectId: id,
+          },
+        });
+      }
       dispatch({
-        type: 'basicLayout/getMenu',
-        payload: {
-          projectId: id,
-        },
-      });
-      dispatch({
-        type: 'basicLayout/getInfo',
+        type: 'user/getInfo',
         payload: {},
       });
     }
@@ -142,51 +96,38 @@ const BasicLayout = props => {
 
   return (
     <ProLayout
-      trigger={null}
-      logo={() => (
-        <img
-          onClick={() => {
-            router.push(`/list`);
-          }}
-          src="https://easyaction-file-1.oss-cn-hangzhou.aliyuncs.com/shot_photo/easyaction/logo/LOGOFULLB260.png"
-          alt=""
-        />
-      )}
+      logo={
+        <a href="/">
+          <img src="https://easyaction-file-1.oss-cn-hangzhou.aliyuncs.com/shot_photo/easyaction/logo/LOGOFULLB260.png" />
+        </a>
+      }
       siderWidth={200}
-      menu={{ locale: false }}
       onCollapse={handleMenuCollapse}
+      collapsedButtonRender={route.hideRoute ? false : undefined}
+      menuRender={route.hideRoute ? false : undefined}
       menuItemRender={(menuItemProps, defaultDom) => {
+        if (route.hideRoute) return;
         if (menuItemProps.isUrl) {
           return defaultDom;
         }
-
         return <Link to={menuItemProps.path.replace(/:id/, id)}>{defaultDom}</Link>;
       }}
       breadcrumbRender={(routers = []) => {
         return [
           {
-            path: '/list',
+            path: '/',
             breadcrumbName: '首页',
           },
           ...routers,
         ];
       }}
-      headerRender={headerRender}
       footerRender={footerRender}
-      menuDataRender={() => menuData}
-      formatMessage={null}
+      menuDataRender={() => (route.routeLocal ? route.routes : menuData)}
       rightContentRender={rightProps => <RightContent {...rightProps} />}
       {...props}
-      {...settings}
-      title={''}
-      collapse={false}
-      fixSiderbar={true}
+      {..._setting}
     >
-      {/* PageHeaderWrapper， 不添加则无法展示面包屑 */}
-      <PageHeaderWrapper />
-      {/* 登出 */}
-      <div className={styles.Person}></div>
-      {children}
+      {route.hideBread ? props.children : <PageHeaderWrapper>{props.children}</PageHeaderWrapper>}
     </ProLayout>
   );
 };

@@ -6,18 +6,30 @@ import {
   modifySenceSimple,
   modifySenceCharacterState,
 } from '@/services/SenceManage';
+import {
+  getLocationData
+} from '@/services/Location'
 import _ from 'lodash';
 
 const Model = {
-  namespace: 'senceManage',
+  namespace: 'location',
   state: {},
   effects: {
+    *getLocationData({ payload, success, fail }, { call, put }) {
+      try {
+        const { data } = yield call(getLocationData, payload.params);
+        if (data.code == 0 && success) success(data.data);
+        if (data.code != 0 && fail) fail(data.msg);
+      } catch (err) {
+        if (fail) fail(err);
+      }
+    },
     *getSenceData({ payload, success, fail }, { call, put }) {
       try {
         const { data } = yield call(getSenceData, payload.params);
         const res = data.data;
         if (data.code == 0 && success) success(data.data);
-        if (data.code != 0) throw new Error(data.msg);
+        if (data.code != 0 && fail) fail(data.msg);
       } catch (err) {
         if (fail) fail(err);
       }
@@ -43,7 +55,7 @@ const Model = {
         if (!handler && success) return success();
         const { data } = yield call(handler, params);
         if (data.code == 0 && success) success(data.data);
-        if (data.code != 0) throw new Error(data.msg);
+        if (data.code != 0 && fail) fail(data.msg);
       } catch (err) {
         if (fail) fail(err);
       }
@@ -88,8 +100,8 @@ const Model = {
             });
             break;
         }
-        if (data.code == 0 && success) success(list);
-        if (data.code != 0) throw new Error(data.msg);
+        if (data.code == 0 && success) success(data.data);
+        if (data.code != 0 && fail) fail(data.msg);
       } catch (err) {
         if (fail) fail(err);
       }

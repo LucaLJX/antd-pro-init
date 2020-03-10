@@ -14,6 +14,9 @@ import {
   AutoComplete,
   InputNumber,
   Divider,
+  Switch,
+  Dropdown,
+  Menu,
 } from 'antd';
 import style from './index.less';
 
@@ -40,11 +43,25 @@ const EDIT_DATA = 'editData';
 const FILTER_DEFAULT = 0;
 const FILTER_EXTEND = 1;
 
+const KEY_CODE_ENTER = 13;
+const KEY_CODE_ESC = 27;
+const KEY_CODE_TAB = 9;
+const KEY_CODE_SHIFT = 16;
+const KEY_CODE_CTRL = 17;
+const KEY_CODE_ALT = 18;
+const KEY_CODE_COMMAND_LEFT = 91;
+const KEY_CODE_COMMAND_RIGHT = 93;
+
 class TableData {
   constructor() {
     this.keyMap = {};
     this.filterMap = {};
     this.agent = null;
+    this.updateAgent = null;
+    this.editMode = false;
+    this.page = 1;
+    this.source = [];
+    this.rowKey = 'key';
     this.clearTable();
     window.onkeydown = this.onKeydown;
     window.onkeyup = this.onKeyup;
@@ -57,7 +74,9 @@ class TableData {
   }
 
   clearTable() {
-    this.selectRow = null;
+    this.selectRow = {};
+    this.selectKey = {};
+    this.selectRowCB = {};
     this.endEditCB = null;
     this.startEditCB = null;
     this.cancelEditCB = null;
@@ -66,8 +85,13 @@ class TableData {
     this.table = null;
   }
 
-  setAgent(agent) {
+  setAgent(agent, updateAgent) {
     this.agent = agent;
+    this.updateAgent = updateAgent;
+  }
+
+  onUpdateAgent(data) {
+    if (this.updateAgent) this.updateAgent(data);
   }
 
   onClick = e => {};
@@ -76,25 +100,23 @@ class TableData {
     let active = false;
     if (this.keyMap[e.keyCode]) return false;
     switch (e.keyCode) {
-      case 13:
+      case KEY_CODE_ENTER:
         this.onEnter(true);
         active = true;
         break;
-      case 16:
-        this.onShift(true);
-        active = true;
-        break;
-      case 17:
-      case 91:
-        this.onCtrl(true);
-        active = true;
-        break;
-      case 27:
+      case KEY_CODE_ESC:
         this.onEsc(true);
         active = true;
         break;
-      case 9:
+      case KEY_CODE_TAB:
         this.onTab(true);
+        active = true;
+        break;
+      case KEY_CODE_SHIFT:
+      case KEY_CODE_CTRL:
+      case KEY_CODE_ALT:
+      case KEY_CODE_COMMAND_LEFT:
+      case KEY_CODE_COMMAND_RIGHT:
         active = true;
         break;
     }
@@ -107,25 +129,23 @@ class TableData {
   onKeyup = e => {
     let active = false;
     switch (e.keyCode) {
-      case 13:
+      case KEY_CODE_ENTER:
         this.onEnter(false);
         active = true;
         break;
-      case 16:
-        this.onShift(false);
-        active = true;
-        break;
-      case 17:
-      case 91:
-        this.onCtrl(false);
-        active = true;
-        break;
-      case 27:
+      case KEY_CODE_ESC:
         this.onEsc(false);
         active = true;
         break;
-      case 9:
+      case KEY_CODE_TAB:
         this.onTab(false);
+        active = true;
+        break;
+      case KEY_CODE_SHIFT:
+      case KEY_CODE_CTRL:
+      case KEY_CODE_ALT:
+      case KEY_CODE_COMMAND_LEFT:
+      case KEY_CODE_COMMAND_RIGHT:
         active = true;
         break;
     }
@@ -140,15 +160,23 @@ class TableData {
     if (b) if (this.enterCB) this.enterCB();
   }
 
-  onShift() {}
-
-  onCtrl() {}
-
   onEsc() {
     this.cancelEdit();
   }
 
   onTab() {}
+
+  isShift() {
+    return this.keyMap[KEY_CODE_SHIFT];
+  }
+
+  isAlt() {
+    return this.keyMap[KEY_CODE_ALT];
+  }
+
+  isCtrl() {
+    return this.keyMap[KEY_CODE_CTRL] || this.keyMap[KEY_CODE_COMMAND_LEFT] || this.keyMap[KEY_CODE_COMMAND_RIGHT];
+  }
 
   onEnterCB(cb) {
     this.enterCB = cb;
@@ -158,7 +186,13 @@ class TableData {
     this.enterCB = null;
   }
 
-  startEdit(cb) {
+  startEdit(type, cb) {
+    if (!this.editMode && type == 'click') {
+      if (!this.isAlt()) return;
+    }
+    if (this.editMode && type == 'click') {
+      if (this.isCtrl() || this.isShift()) return;
+    }
     if (this.endEditCB) {
       this.startEditCB = cb;
     } else {
@@ -202,16 +236,99 @@ class TableData {
     this.enterEditCB = cb;
   }
 
-  onSelectRow(cb) {
-    this.selectRowCB = cb;
+  onSelectRow(key, cb) {
+    this.selectRowCB[key] = cb;
+  }
+
+  emitSelectRow(key, selected, position = '') {
+    if (this.selectRowCB[key]) this.selectRowCB[key](selected, position);
   }
 
   setSelectRow(index) {
-    this.selectRow = index;
+    if (!this.selectRow[this.page]) this.selectRow[this.page] = [];
+    const key = this.source[index][this.rowKey];
+    const unSelected = [];
+    if (this.isCtrl()) {
+      if (this.selectKey[key]) {
+        this.selectRow[this.page].splice(this.selectRow[this.page].indexOf(index), 1);
+        delete this.selectKey[key];
+        unSelected.push(key);
+      } else {
+        this.selectRow[this.page].push(index);
+        this.selectKey[key] = true;
+      }
+    } else if (this.isShift()) {
+      const last =
+        this.selectRow[this.page].length > 0 ? this.selectRow[this.page][this.selectRow[this.page].length - 1] : index;
+      for (let i = last; last > index ? i >= index : i <= index; last > index ? (i -= 1) : (i += 1)) {
+        if (!this.selectKey[this.source[i][this.rowKey]]) {
+          this.selectRow[this.page].push(i);
+          this.selectKey[this.source[i][this.rowKey]] = true;
+        }
+      }
+    } else {
+      for (let k in this.selectKey) {
+        unSelected.push(k);
+      }
+      if ((!this.editMode && this.isAlt()) || (this.editMode && !this.isCtrl() && !this.isShift())) {
+        this.selectRow = { [this.page]: [] };
+        this.selectKey = {};
+      } else {
+        this.selectRow = { [this.page]: [index] };
+        this.selectKey = { [key]: true };
+      }
+    }
+    const selected = [];
+    this.selectRow[this.page].forEach(i => {
+      const k = this.source[i][this.rowKey];
+      let p = '';
+      if (!this.source[i - 1] || !this.selectKey[this.source[i - 1][this.rowKey]]) {
+        p += ' top';
+      }
+      if (!this.source[i + 1] || !this.selectKey[this.source[i + 1][this.rowKey]]) {
+        p += ' bottom';
+      }
+      this.emitSelectRow(k, true, p);
+      selected.push(k);
+    });
+    unSelected.forEach(k => {
+      this.emitSelectRow(k, false);
+    });
+
+    if (this.agent && this.agent.onSelectedChange) this.agent.onSelectedChange(selected);
   }
 
-  getSelectRow() {
-    return this.selectRow;
+  getSelectByKey(key) {
+    let position = '';
+    let i = 0;
+    for (; i < this.source.length; i += 1) {
+      if (this.source[i][this.rowKey] === key) break;
+    }
+    if (!this.source[i - 1] || !this.selectKey[this.source[i - 1][this.rowKey]]) {
+      position += ' top';
+    }
+    if (!this.source[i + 1] || !this.selectKey[this.source[i + 1][this.rowKey]]) {
+      position += ' bottom';
+    }
+    return { selected: this.selectKey[key], position };
+  }
+
+  getAllSelect() {
+    return this.selectKey;
+  }
+
+  setTableData({ current, dataSource, rowKey }) {
+    this.page = current;
+    this.source = dataSource;
+    this.rowKey = rowKey;
+  }
+
+  setEditMode(checked) {
+    this.editMode = checked;
+  }
+
+  getEditMode() {
+    return this.editMode;
   }
 
   onFilterShow(key, cb) {
@@ -230,12 +347,30 @@ class TableData {
     }
   }
 
+  onContextMenu(record, column) {
+    let menu = [];
+    if (this.agent && this.agent.onContextMenu) {
+      menu = this.agent.onContextMenu(record, column) || [];
+      if (!(menu instanceof Array)) menu = [];
+    }
+    this.onUpdateAgent({ menu });
+  }
+
+  onHeadContextMenu(column) {
+    let menu = [];
+    if (this.agent && this.agent.onHeadContextMenu) {
+      menu = this.agent.onHeadContextMenu(column) || [];
+      if (!(menu instanceof Array)) menu = [];
+    }
+    this.onUpdateAgent({ menu });
+  }
+
   onChangeValue(record, column, value, cb) {
-    if (this.agent && this.agent.onChangeValue) return this.agent.onChangeValue(record, column, value, cb);
+    if (this.agent && this.agent.onChangeValue) this.agent.onChangeValue(record, column, value, cb);
   }
 
   getSelectData(type, column, cb) {
-    if (this.agent && this.agent.getSelectData) return this.agent.getSelectData(type, column, cb);
+    if (this.agent && this.agent.getSelectData) this.agent.getSelectData(type, column, cb);
   }
 }
 
@@ -311,6 +446,7 @@ class EaTable extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      editMode: tableData.getEditMode(),
       columns:
         props.columns.map(column => {
           return this.formatHeader(column);
@@ -319,13 +455,18 @@ class EaTable extends Component {
       full: false,
       filter: false,
       key: refreshKey(),
+      menu: [],
     };
-    tableData.setAgent(this.props);
+    tableData.setAgent(this.props, data => {
+      this.setState(data);
+    });
   }
 
   componentWillReceiveProps(newProps) {
     this.state.columns =
-      newProps.columns.map(column => {
+      newProps.columns.map((column, index) => {
+        if (index === 0) column.position = 'start';
+        if (index === newProps.columns.length - 1) column.position = 'end';
         return this.formatHeader(column);
       }) || [];
   }
@@ -395,8 +536,27 @@ class EaTable extends Component {
     }
   }
 
+  onEditChange(checked) {
+    tableData.setEditMode(checked);
+    this.setState({ editMode: tableData.getEditMode() });
+  }
+
+  getMenu(item) {
+    if (item.divider) return <Menu.Divider />;
+    if (item.children) {
+      return (
+        <Menu.SubMenu {...item}>
+          {item.children.map(_item => {
+            return this.getMenu(_item);
+          })}
+        </Menu.SubMenu>
+      );
+    }
+    return <Menu.Item {...item}>{item.title}</Menu.Item>;
+  }
+
   render() {
-    const { columns, scaleType, size, full, filter, key } = this.state;
+    const { columns, scaleType, size, full, filter, key, editMode, menu = [] } = this.state;
     const {
       fullId,
       totalInfo,
@@ -409,7 +569,11 @@ class EaTable extends Component {
       onChange,
       onChangePage,
       onShowSizeChange,
+      onMenuClick,
+      pagination = true,
+      edit = true,
     } = this.props;
+    tableData.setTableData(this.props);
     return (
       <div className={style.body}>
         <div className="info-warpper">
@@ -428,41 +592,65 @@ class EaTable extends Component {
             />
           </div>
           <div className="action-list">
-            <Icon hidden={!fullId} type={full ? 'fullscreen-exit' : 'fullscreen'} onClick={() => this.switchFull()} />
-            <Select value={size} onChange={value => this.setState({ size: value })}>
-              <Select.Option value={10}>100%</Select.Option>
-              <Select.Option value={9}>90%</Select.Option>
-              <Select.Option value={8}>80%</Select.Option>
-              <Select.Option value={7}>70%</Select.Option>
-            </Select>
+            {edit && (
+              <div className="action">
+                <span className="edit-mode">
+                  编辑模式 : <Switch checked={editMode} onChange={value => this.onEditChange(value)} />
+                </span>
+              </div>
+            )}
+            <div className="action">
+              <Icon hidden={!fullId} type={full ? 'fullscreen-exit' : 'fullscreen'} onClick={() => this.switchFull()} />
+              <Select value={size} onChange={value => this.setState({ size: value })}>
+                <Select.Option value={10}>100%</Select.Option>
+                <Select.Option value={9}>90%</Select.Option>
+                <Select.Option value={8}>80%</Select.Option>
+                <Select.Option value={7}>70%</Select.Option>
+              </Select>
+            </div>
           </div>
         </div>
-        <div className={`table-wrapper scale s-${size}`}>
-          <Table
-            key={key}
-            rowKey={rowKey}
-            size="small"
-            bordered={false}
-            loading={loading}
-            getPopupContainer={() => tableData.getTable()}
-            components={{
-              header: { row: TableHeaderRow, cell: TableHeaderCell },
-              body: { row: TableBodyRow, cell: TableBodyCell },
-            }}
-            dataSource={dataSource}
-            pagination={{
-              size: 'small',
-              current,
-              pageSize,
-              pageSizeOptions: ['10', '20', '30', '40'],
-              total,
-              showSizeChanger: true,
-              showQuickJumper: true,
-            }}
-            columns={columns}
-            onChange={(pagination, filters, sorter) => this.onChange(pagination, filters, sorter)}
-          ></Table>
-        </div>
+        <Dropdown
+          overlay={
+            <Menu onClick={item => onMenuClick && onMenuClick(item)}>
+              {menu.map(item => {
+                return this.getMenu(item);
+              })}
+            </Menu>
+          }
+          trigger={['contextMenu']}
+        >
+          <div className={`table-wrapper scale s-${size}`}>
+            <Table
+              key={key}
+              rowKey={rowKey}
+              size="small"
+              bordered={false}
+              loading={loading}
+              getPopupContainer={() => tableData.getTable()}
+              components={{
+                header: { row: TableHeaderRow, cell: TableHeaderCell },
+                body: { row: TableBodyRow, cell: TableBodyCell },
+              }}
+              dataSource={dataSource}
+              pagination={
+                pagination
+                  ? {
+                      size: 'small',
+                      current,
+                      pageSize,
+                      pageSizeOptions: ['10', '20', '30', '40'],
+                      total,
+                      showSizeChanger: true,
+                      showQuickJumper: true,
+                    }
+                  : false
+              }
+              columns={columns}
+              onChange={(pagination, filters, sorter) => this.onChange(pagination, filters, sorter)}
+            ></Table>
+          </div>
+        </Dropdown>
       </div>
     );
   }
@@ -475,6 +663,11 @@ class TableHeaderRow extends Component {
 }
 
 class TableHeaderCell extends Component {
+  onContextMenu() {
+    const { column } = this.props;
+    tableData.onHeadContextMenu(column);
+  }
+
   format(column, children) {
     switch (column.headerType) {
       case 'vertical':
@@ -484,6 +677,7 @@ class TableHeaderCell extends Component {
     }
     return children;
   }
+
   render() {
     const { children, column } = this.props;
     return (
@@ -491,6 +685,7 @@ class TableHeaderCell extends Component {
         {...this.props}
         style={column.minWidth ? { minWidth: column.minWidth } : {}}
         className={`${this.props.className || ''} ${column.headerType} ea-table-header-cell`}
+        onContextMenu={() => this.onContextMenu()}
       >
         {this.format(column, children)}
       </th>
@@ -499,8 +694,21 @@ class TableHeaderCell extends Component {
 }
 
 class TableBodyRow extends Component {
+  constructor(props) {
+    super(props);
+    this.state = tableData.getSelectByKey(props['data-row-key']);
+    tableData.onSelectRow(props['data-row-key'], (selected, position) => {
+      this.setState({ selected, position });
+    });
+  }
   render() {
-    return <tr {...this.props} className={this.props.className + ' ea-table-body-row'} />;
+    const { selected, position } = this.state;
+    return (
+      <tr
+        {...this.props}
+        className={`${this.props.className} ea-table-body-row ${selected ? 'selected' : ''} ${position}`}
+      />
+    );
   }
 }
 
@@ -621,36 +829,54 @@ class TableBodyCell extends Component {
 
   onDeselect() {}
 
+  onContextMenu() {
+    const { column, record } = this.props;
+    tableData.onContextMenu(record, column);
+  }
+
+  onDoubleClick() {
+    const { edit } = this.state;
+    if (edit) return;
+    tableData.startEdit('doubleClick', () => {
+      this.openEdit();
+    });
+  }
+
   onClick() {
     const { edit } = this.state;
     if (edit) return;
-    const { index, column } = this.props;
-    tableData.startEdit(() => {
-      this.setState({ edit: true });
-      tableData.getSelectData(EDIT_DATA, column, list => {
-        this.setState({ oList: list });
-      });
-      tableData.onCancelEdit(cb => {
-        this.setState({ edit: false, error: false, value: null });
-        cb();
-      });
-      tableData.onEndEdit(cb => {
-        this.editEnding = true;
-        this.onChangeValue(this.state.value, err => {
-          if (err) {
-            this.setState({ error: true });
-          } else {
-            this.setState({ edit: false, error: false, value: null });
-            cb();
-          }
-          this.editEnding = false;
-        });
-      });
-      tableData.onEnterEdit(() => {
-        this.onEnter();
+    const { index } = this.props;
+    tableData.setSelectRow(index);
+    tableData.startEdit('click', () => {
+      this.openEdit();
+    });
+  }
+
+  openEdit() {
+    const { column } = this.props;
+    this.setState({ edit: true });
+    tableData.getSelectData(EDIT_DATA, column, list => {
+      this.setState({ oList: list });
+    });
+    tableData.onCancelEdit(cb => {
+      this.setState({ edit: false, error: false, value: null });
+      cb();
+    });
+    tableData.onEndEdit(cb => {
+      this.editEnding = true;
+      this.onChangeValue(this.state.value, err => {
+        if (err) {
+          this.setState({ error: true });
+        } else {
+          this.setState({ edit: false, error: false, value: null });
+          cb();
+        }
+        this.editEnding = false;
       });
     });
-    tableData.setSelectRow(index);
+    tableData.onEnterEdit(() => {
+      this.onEnter();
+    });
   }
 
   onChangeValue(value, cb) {
@@ -790,7 +1016,13 @@ class TableBodyCell extends Component {
     const { column, record } = this.props;
     const { edit, error } = this.state;
     return (
-      <td {...this.props} className={this.props.className + ' ea-table-body-cell'} onClick={() => this.onClick()}>
+      <td
+        {...this.props}
+        className={`${this.props.className} ea-table-body-cell ${column.position ? column.position : ''}`}
+        onDoubleClick={() => this.onDoubleClick()}
+        onClick={() => this.onClick()}
+        onContextMenu={() => this.onContextMenu()}
+      >
         {this.format(column, record)}
         {edit && <div className={`edit ${error ? 'error' : ''}`}>{this.formatEdit(column, record)}</div>}
       </td>
